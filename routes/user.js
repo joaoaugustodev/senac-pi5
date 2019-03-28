@@ -6,6 +6,9 @@ router.get('/', (req, res) => {
 })
 
 router.get('/marcelo/:id', (req, res) => {
+    if (req.params.type === 'userjobber') {
+
+    }
     res.json({ name: 'Marcelo Fodãol!', id: req.params.id })
 })
 
