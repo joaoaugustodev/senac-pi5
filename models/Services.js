@@ -8,6 +8,30 @@ const servicesSchema = new Schmema({
   idUserJobber: {
     type: Schmema.Types.ObjectId,
     ref: 'UserJobber'
+  },
+  idTypeService: {
+    type: Schmema.Types.ObjectId,
+    ref: 'TypeService'
+  },
+  idAnimal: {
+    type: Schmema.Types.ObjectId,
+    ref: 'Animal'
+  },
+  date: {
+    type: Date,
+    default: Date.now()
+  },
+  ownerServiceConfirmation: {
+    type: Boolean,
+    default: false
+  },
+  jobberServiceConfirmation: {
+    type: Boolean,
+    default: false
+  },
+  serviceStatus: {
+    type: String,
+    required: true
   }
 })
 

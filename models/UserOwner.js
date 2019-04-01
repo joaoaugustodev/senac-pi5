@@ -1,6 +1,5 @@
 const { Schema, model } = require('mongoose')
 const jwt = require('jsonwebtoken')
-const Comments = require('./Comments')
 
 require('dotenv').config()
 
@@ -41,7 +40,7 @@ const UserOwnerSchema = new Schema({
   },
   birthday: {
     type: Date,
-    default: Date.now()
+    required: [true, 'A data de aniversário é obrigatória']
   },
   address: {
     type: String,
@@ -68,14 +67,17 @@ const UserOwnerSchema = new Schema({
   capaPhoto: {
     type: String
   },
-  comments: [Comments],
+  comments: {
+    type: Schema.Types.ObjectId,
+    ref: 'Comments'
+  },
   animals: {
-    type: Array,
-    required: true
+    type: Schema.Types.ObjectId,
+    ref: 'Animal'
   }
 })
 
-UserSchema.pre('save', function (next) {
+UserOwnerSchema.pre('save', function (next) {
   if (!this.token) {
     this.token = jwt.sign({ name: this.name, type: this.type }, process.env.PASS_TOKEN)
   }
@@ -83,4 +85,4 @@ UserSchema.pre('save', function (next) {
   next()
 })
 
-module.exports = model('UserOwner', UserOwnerSchema)
+module.exports = model('UserOwner', UserOwnerSchema, 'UserOwner')

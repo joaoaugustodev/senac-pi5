@@ -1,12 +1,12 @@
-const { Schmema, model } = require('mongoose')
+const { Schema, model } = require('mongoose')
 
-const commentsSchema = new Schmema({
+const commentsSchema = new Schema({
   idUserJobber: {
-    type: Schmema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'UserOwner'
   },
   idUserOwner: {
-    type: Schmema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'UserOwner'
   },
   comment: {
@@ -26,4 +26,4 @@ const commentsSchema = new Schmema({
   }
 })
 
-module.exports = model('Comments', commentsSchema)
+module.exports = model('Comments', commentsSchema, 'Comments')

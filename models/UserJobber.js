@@ -1,6 +1,7 @@
 const { Schema, model } = require('mongoose')
 const jwt = require('jsonwebtoken')
 const Comments = require('./Comments')
+const TypeServices = require('./TypeServices')
 
 require('dotenv').config()
 
@@ -65,10 +66,11 @@ const UserJobberSchema = new Schema({
   photo: {
     type: String
   },
-  capaPhoto: {
+  slidePhoto: {
     type: String
   },
   comments: [Comments],
+  typeServices: [TypeServices]
 })
 
 UserSchema.pre('save', function (next) {
@@ -79,4 +81,4 @@ UserSchema.pre('save', function (next) {
   next()
 })
 
-module.exports = model('UserJobber', UserJobber)
+module.exports = model('UserJobber', UserJobber, 'UserJobber')
