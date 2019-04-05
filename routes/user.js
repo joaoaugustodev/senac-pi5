@@ -8,13 +8,11 @@ const jwt = require('jsonwebtoken')
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body
 
-  if (!email || !password) return res.status(403).json(response.send('failLogin'))
-
   try {
     const data = await UserOwner.findOne({ email })
 
     bcrypt.compare(password, data.password, (err, info)  => {
-      if (!!data || !info) {
+      if (!data || !info) {
         return res
           .status(403)
           .json(response.send('failLogin', null, 'Login inválido.'))
@@ -37,7 +35,7 @@ router.post('/signup', async (req, res) => {
       const infoUser = await UserOwner.findOne({ email: data.email })
 
       if (infoUser) {
-        return res.status(500).json(response.send('error', null, 'Usuário já existe.'))
+        return res.status(403).json(response.send('error', null, 'Usuário já existe.'))
       }
     } catch (e) {
       res.status(500).json(response.send('errorLogin'))
