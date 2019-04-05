@@ -17,6 +17,18 @@ const response = {
     message: 'Usuário não permetido. E-mail ou Senha podem estar errados.',
     result: null
   },
+  success: {
+    statusCode: 200,
+    status: 'OK',
+    message: null,
+    result: null
+  },
+  error: {
+    statusCode: 403,
+    status: 'Forbidden',
+    message: null,
+    result: null
+  }
 }
 
 module.exports = {

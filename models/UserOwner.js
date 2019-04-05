@@ -1,5 +1,6 @@
 const { Schema, model } = require('mongoose')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 require('dotenv').config()
 
@@ -78,10 +79,16 @@ const UserOwnerSchema = new Schema({
 })
 
 UserOwnerSchema.pre('save', function (next) {
-  if (!this.token) {
-    this.token = jwt.sign({ name: this.name, type: this.type }, process.env.PASS_TOKEN)
-  }
+  if (this.isModified('password')) {
+    return bcrypt.hash(this.password, 8, (err, hash) => {
+      if (err) {
+        return next(err)
+      }
 
+      this.password = hash
+      next()
+    })
+  }
   next()
 })
 
