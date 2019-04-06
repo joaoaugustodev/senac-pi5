@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const service = require('../models/Services')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
+//const verifyToken = require('../middleware/verifyJwt')
 
 router.post('/create', async (req, res) => {
     const data = new service(req.body)
