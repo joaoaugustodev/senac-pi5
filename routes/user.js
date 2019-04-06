@@ -19,7 +19,7 @@ router.post('/signin', async (req, res) => {
     const data = await UserOwner.findOne({ email })
 
     bcrypt.compare(password, data.password, (err, info)  => {
-      if (!!data || !info) {
+      if (!data || !info) {
         return res
           .status(403)
           .json(response.send('failLogin', null, 'Login inválido.'))
