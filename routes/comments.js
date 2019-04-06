@@ -34,5 +34,6 @@ router.post('/create', async (req, res) => {
 })
 
 //verificar se existe o owner e o jobber
+//necessário verificar o token
 
 module.exports = router

@@ -28,4 +28,23 @@ router.post('/create', async (req, res) => {
     }
 })
 
+router.get('/', async (req, res) => {
+    try{
+        const data = await typeservice.find();
+        res.status(200).json({
+            statusCode: 200,
+            status: "OK",
+            message: 'Tipos de serviços retornados com sucesso',
+            result: data
+        })
+    }catch(e){
+        res.status(500).json({
+            statusCode: 500,
+            status: "Internal Server Error",
+            message: "Erro ao consultar os dados dos tipos de serviços",
+            error: e
+        })
+    }
+})
+
 module.exports = router
