@@ -29,6 +29,12 @@ app.use('/animal', animalRouter);
 const commentRouter = require('./routes/comments');
 app.use('/comments', commentRouter);
 
+const serviceRouter = require('./routes/service');
+app.use('/service', serviceRouter);
+
+const typeServiceRouter = require('./routes/typeservice');
+app.use('/typeservice', typeServiceRouter);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404))

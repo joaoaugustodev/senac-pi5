@@ -50,7 +50,6 @@ router.post('/signup', async (req, res) => {
 
   if (!data.validateSync()) {
     data.save()
-    data.password = null
     res.setHeader('token', jwt.sign({ name: data.name }, process.env.PASS_TOKEN))
     return res.status(200).json(response.send('success', data, 'Dados inseridos com sucesso.'))
   }
