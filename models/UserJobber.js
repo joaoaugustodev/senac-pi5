@@ -70,14 +70,14 @@ const UserJobberSchema = new Schema({
   slidePhoto: {
     type: String
   },
-  comments: {
-    type: Schema.Types.ObjectId,
-    ref: 'Comments'
-  },
-  typeServices: {
-    type: Schema.Types.ObjectId,
-    ref: 'TypeServices'
-  }
+  // comments: {
+  //   type: Schema.Types.ObjectId,
+  //   ref: 'Comments'
+  // },
+  // typeServices: {
+  //   type: Schema.Types.ObjectId,
+  //   ref: 'TypeServices'
+  // }
   //faltando (dias de trabalho)
   // horário inicial e horário final
 })
