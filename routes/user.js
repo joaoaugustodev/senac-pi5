@@ -6,6 +6,11 @@ const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
 const verifyToken = require('../middleware/verifyJwt')
 
+router.get('/oi', async (req, res) => {
+  const data = await UserOwner.find();
+  res.status(200).json(data);
+})
+
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body
 

@@ -3,7 +3,7 @@ const { Schema, model } = require('mongoose')
 const commentsSchema = new Schema({
   idUserJobber: {
     type: Schema.Types.ObjectId,
-    ref: 'UserOwner'
+    ref: 'UserJobber'
   },
   idUserOwner: {
     type: Schema.Types.ObjectId,

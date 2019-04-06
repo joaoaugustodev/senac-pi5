@@ -14,9 +14,18 @@ const typeServicesSchema = new Schema({
     required: true
   },
   sizes: {
-    small: 1,
-    medium: 1.25,
-    large: 1.5
+    small: {
+      type: Number,
+      default: 1,
+    },
+    medium: {
+      type: Number,
+      default: 1.25
+    },
+    large: {
+      type: Number,
+      default: 1.5
+    }
   }
 })
 
