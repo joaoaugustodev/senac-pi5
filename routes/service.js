@@ -30,4 +30,6 @@ router.post('/create', async (req, res) => {
     }
 })
 
+//necessário verificar o token
+
 module.exports = router

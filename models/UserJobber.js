@@ -70,6 +70,44 @@ const UserJobberSchema = new Schema({
   slidePhoto: {
     type: String
   },
+  weekDays:{
+    sunday: {
+      type: Boolean,
+      required: true,
+    },
+    monday: {
+      type: Boolean,
+      required: true,
+    },
+    tuesday: {
+      type: Boolean,
+      required: true,
+    },
+    wednesday: {
+      type: Boolean,
+      required: true,
+    },
+    thursday: {
+      type: Boolean,
+      required: true,
+    },
+    friday: {
+      type: Boolean,
+      required: true,
+    },
+    saturday: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  startTime:{
+    type: Date,
+    required: [true, 'O horário inicial é obrigatório.']
+  },
+  endTime:{
+    type: Date,
+    required: [true, 'O horário final é obrigatório.']
+  },
   comments: {
     type: Schema.Types.ObjectId,
     ref: 'Comments'
@@ -78,8 +116,6 @@ const UserJobberSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'TypeServices'
   }
-  //faltando (dias de trabalho)
-  // horário inicial e horário final
 })
 
 UserJobberSchema.pre('save', function (next) {
