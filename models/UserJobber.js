@@ -43,7 +43,7 @@ const UserJobberSchema = new Schema({
   },
   birthday: {
     type: Date,
-    default: Date.now()
+    required: [true, 'A data de aniversário é obrigatória']
   },
   address: {
     type: String,
