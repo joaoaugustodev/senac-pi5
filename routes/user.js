@@ -5,17 +5,20 @@ const UserOwner = require('../models/UserOwner')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
 const verifyToken = require('../middleware/verifyJwt')
-
-router.get('/oi', async (req, res) => {
-  const data = await UserOwner.find();
-  res.status(200).json(data);
-})
+const upload = require('../middleware/upload')
+const helperEdit = require('./helper/helperEdit')
+const uploadPhotos = upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'capaPhoto', maxCount: 1 }])
 
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body
 
   try {
     const data = await UserOwner.findOne({ email })
+
+    UserOwner.findOneAndUpdate({email}, { active: true }, {new: true}, (err, data) => {
+      if (err) return res.status(500).json(response.send('error500'))
+      data.save()
+    })
 
     bcrypt.compare(password, data.password, (err, info)  => {
       if (!data || !info) {
@@ -50,7 +53,6 @@ router.post('/signup', async (req, res) => {
 
   if (!data.validateSync()) {
     data.save()
-    data.password = null
     res.setHeader('token', jwt.sign({ name: data.name }, process.env.PASS_TOKEN))
     return res.status(200).json(response.send('success', data, 'Dados inseridos com sucesso.'))
   }
@@ -65,21 +67,27 @@ router.post('/signup', async (req, res) => {
   })
 })
 
-router.put('/edit/:id', verifyToken, (req, res) => {
+router.put('/edit/:id', uploadPhotos, verifyToken, (req, res) => {
   if (!req.token) {
-    return res
-      .status(401)
-      .json({
-        statusCode: 401, status: 'error request unauthorized', message: 'O usuário não está autenticado.', result: null
-      })
+    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
   }
 
-  UserOwner.findOneAndUpdate(req.params._id, req.body, { new: false }, (err, data) => {
-    if (err) {
-      return res.status(500).json(response.send('error500'))
-    }
-
+  UserOwner.findOneAndUpdate(req.params._id, helperEdit(req.body, req.files), {new: true}, (err, data) => {
+    if (err) return res.status(500).json(response.send('error500'))
+    data.save()
     res.status(200).json(response.send('success', data, 'Dados atualizados com sucesso.'))
+  })
+})
+
+router.delete('/delete/:id', uploadPhotos, verifyToken, (req, res) => {
+  if (!req.token) {
+    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+  }
+
+  UserOwner.findOneAndUpdate(req.params._id, { active: false }, {new: true}, (err, data) => {
+    if (err) return res.status(500).json(response.send('error500'))
+    data.save()
+    res.status(200).json(response.send('removed', data, 'Usuario Removido com sucesso'))
   })
 })
 
