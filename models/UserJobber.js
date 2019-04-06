@@ -1,5 +1,6 @@
 const { Schema, model } = require('mongoose')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 const Comments = require('./Comments')
 const TypeServices = require('./TypeServices')
 
@@ -69,11 +70,19 @@ const UserJobberSchema = new Schema({
   slidePhoto: {
     type: String
   },
-  comments: [Comments],
-  typeServices: [TypeServices]
+  comments: {
+    type: Schema.Types.ObjectId,
+    ref: 'Comments'
+  },
+  typeServices: {
+    type: Schema.Types.ObjectId,
+    ref: 'TypeServices'
+  }
+  //faltando (dias de trabalho)
+  // horário inicial e horário final
 })
 
-UserSchema.pre('save', function (next) {
+UserJobberSchema.pre('save', function (next) {
   if (!this.token) {
     this.token = jwt.sign({ name: this.name, type: this.type }, process.env.PASS_TOKEN)
   }
@@ -81,4 +90,4 @@ UserSchema.pre('save', function (next) {
   next()
 })
 
-module.exports = model('UserJobber', UserJobber, 'UserJobber')
+module.exports = model('UserJobber', UserJobberSchema, 'UserJobber')

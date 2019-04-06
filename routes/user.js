@@ -5,11 +5,16 @@ const UserOwner = require('../models/UserOwner')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
 
+router.get('/oi', async (req, res) => {  
+  const data = await UserOwner.find();
+  res.status(200).json(data);
+})
+
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body
 
   if (!email || !password) return res.status(403).json(response.send('failLogin'))
-
+ 
   try {
     const data = await UserOwner.findOne({ email })
 
@@ -26,7 +31,7 @@ router.post('/signin', async (req, res) => {
     })
   } catch (e) {
     res.status(500).json(response.send('errorLogin'))
-  }
+  } 
 })
 
 router.post('/signup', async (req, res) => {

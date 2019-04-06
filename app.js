@@ -17,9 +17,17 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(cors())
 
-const userRouter = require('./routes/user')
-
+const userRouter = require('./routes/user');
 app.use('/user', userRouter)
+
+const userJobberRouter = require('./routes/jobber');
+app.use('/jobber', userJobberRouter);
+
+const animalRouter = require('./routes/animal');
+app.use('/animal', animalRouter);
+
+const commentRouter = require('./routes/comments');
+app.use('/comments', commentRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
