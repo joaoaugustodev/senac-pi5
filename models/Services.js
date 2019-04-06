@@ -1,20 +1,24 @@
-const { Schmema, model } = require('mongoose')
+const { Schema, model } = require('mongoose')
+const Animal = require('./Animal')
+const UserOwner = require('./UserOwner')
+const UserJobber = require('./UserJobber')
+const TypeServices = require('./TypeServices')
 
-const servicesSchema = new Schmema({
+const servicesSchema = new Schema({
   idUserOwner: {
-    type: Schmema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'UserOwner'
   },
   idUserJobber: {
-    type: Schmema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'UserJobber'
   },
   idTypeService: {
-    type: Schmema.Types.ObjectId,
-    ref: 'TypeService'
+    type: Schema.Types.ObjectId,
+    ref: 'TypeServices'
   },
   idAnimal: {
-    type: Schmema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Animal'
   },
   date: {
@@ -31,7 +35,7 @@ const servicesSchema = new Schmema({
   },
   serviceStatus: {
     type: String,
-    required: true
+    default: 'solicitado'
   }
 })
 
