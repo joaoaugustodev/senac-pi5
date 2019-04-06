@@ -17,6 +17,10 @@ const UserOwnerSchema = new Schema({
     type: String,
     required: [true, 'A senha não foi informado']
   },
+  active: {
+    type: Boolean,
+    default: true
+  },
   description: {
     type: String
   },

@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const UserOwner = require('../models/UserOwner')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
+const verifyToken = require('../middleware/verifyJwt')
 
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body
@@ -56,6 +57,24 @@ router.post('/signup', async (req, res) => {
     result: {
       error: Object.keys(error.errors).map(item => error.errors[item].message)
     }
+  })
+})
+
+router.put('/edit/:id', verifyToken, (req, res) => {
+  if (!req.token) {
+    return res
+      .status(401)
+      .json({
+        statusCode: 401, status: 'error request unauthorized', message: 'O usuário não está autenticado.', result: null
+      })
+  }
+
+  UserOwner.findOneAndUpdate(req.params._id, req.body, { new: false }, (err, data) => {
+    if (err) {
+      return res.status(500).json(response.send('error500'))
+    }
+
+    res.status(200).json(response.send('success', data, 'Dados atualizados com sucesso.'))
   })
 })
 

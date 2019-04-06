@@ -28,6 +28,12 @@ const response = {
     status: 'Forbidden',
     message: null,
     result: null
+  },
+  error500: {
+    statusCode: 500,
+    status: 'Server error',
+    message: 'Ocorreu um erro de serviidor, por favor informe aos desenvolvedores',
+    result: null
   }
 }
 
