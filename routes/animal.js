@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const animal = require('../models/Animal')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
+const verifyToken = require('../middleware/verifyJwt')
 
 router.post('/create', async (req, res) => {
     const data = new animal(req.body)
@@ -27,6 +28,18 @@ router.post('/create', async (req, res) => {
             })
         }
     }
+})
+
+router.delete('/delete/:id', verifyToken, (req, res) => {
+    if (!req.token) {
+      return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+    }
+  
+    animal.findOneAndUpdate(req.params._id, { status: false }, {new: true}, (err, data) => {
+      if (err) return res.status(500).json(response.send('error500'))
+      data.save()
+      res.status(200).json(response.send('removed', data, 'Animal removido com sucesso.'))
+    })
 })
 
 module.exports = router
