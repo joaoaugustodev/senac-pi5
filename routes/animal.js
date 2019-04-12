@@ -30,16 +30,81 @@ router.post('/create', async (req, res) => {
     }
 })
 
-router.delete('/delete/:id', verifyToken, (req, res) => {
-    if (!req.token) {
+router.put('/edit', async(req, res) => {
+    const dataParam = req.body;
+    /*if (!req.token) {
       return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
-    }
+    }*/
   
-    animal.findOneAndUpdate(req.params._id, { status: false }, {new: true}, (err, data) => {
-      if (err) return res.status(500).json(response.send('error500'))
-      data.save()
-      res.status(200).json(response.send('removed', data, 'Animal removido com sucesso.'))
-    })
+    const animalReturn = await animal.findOne({'_id': req.query.id})
+
+    if (animalReturn != null){
+
+        animal.findOneAndUpdate({'_id': req.query.id}, dataParam, {upsert : false}, (err, data) => {
+            if (!err) {
+                return res.status(200).json({
+                    statusCode: 200,
+                    status: "OK",
+                    message: 'Dados alterados com sucesso!',
+                    result: data 
+                })
+              } else {
+                res.status(500).json({
+                  statusCode: 500,
+                  status: 'error',
+                  message: 'Não foi possível completar a operação.',
+                  result: err
+                })
+              }
+        })
+
+    }else{
+        return res.status(200).json({
+            statusCode: 404,
+            status: "not found",
+            message: 'Animal não encontrado.',
+            result: null 
+          })
+    }
+
+})
+
+router.delete('/delete', async(req, res) => {
+    /*if (!req.token) {
+      return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+    }*/
+  
+    const animalReturn = await animal.findOne({'_id': req.query.id})
+
+    if (animalReturn != null){
+
+        animal.findOneAndUpdate({'_id': req.query.id}, { status: false }, {new: true}, async(err, data) => {
+            if (!err) {
+                return res.status(200).json({
+                    statusCode: 200,
+                    status: "OK",
+                    message: 'Dados alterados com sucesso!',
+                    result: data 
+                })
+              } else {
+                res.status(500).json({
+                  statusCode: 500,
+                  status: 'error',
+                  message: 'Não foi possível completar a operação.',
+                  result: err
+                })
+              }
+        })
+
+    }else{
+        return res.status(200).json({
+            statusCode: 404,
+            status: "not found",
+            message: 'Animal não encontrado.',
+            result: null 
+          })
+    }
+
 })
 
 module.exports = router
