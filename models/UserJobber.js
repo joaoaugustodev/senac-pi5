@@ -19,6 +19,10 @@ const UserJobberSchema = new Schema({
     type: String,
     required: [true, 'A senha não foi informado']
   },
+  active: {
+    type: Boolean,
+    required: [true]
+  },
   description: {
     type: String
   },
