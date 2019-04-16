@@ -19,6 +19,10 @@ const UserJobberSchema = new Schema({
     type: String,
     required: [true, 'A senha não foi informado']
   },
+  active: {
+    type: Boolean,
+    required: [true]
+  },
   description: {
     type: String
   },
@@ -70,14 +74,14 @@ const UserJobberSchema = new Schema({
   slidePhoto: {
     type: String
   },
-  comments: {
-    type: Schema.Types.ObjectId,
-    ref: 'Comments'
-  },
-  typeServices: {
-    type: Schema.Types.ObjectId,
-    ref: 'TypeServices'
-  }
+  // comments: {
+  //   type: Schema.Types.ObjectId,
+  //   ref: 'Comments'
+  // },
+  // typeServices: {
+  //   type: Schema.Types.ObjectId,
+  //   ref: 'TypeServices'
+  // }
   //faltando (dias de trabalho)
   // horário inicial e horário final
 })
