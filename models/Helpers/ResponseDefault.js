@@ -34,6 +34,18 @@ const response = {
     status: 'Server error',
     message: 'Ocorreu um erro de serviidor, por favor informe aos desenvolvedores',
     result: null
+  },
+  error401: {
+    statusCode: 401,
+    status: 'error request unauthorized',
+    message: null,
+    result: null
+  },
+  removed: {
+    statusCode: 200,
+    status: 'OK',
+    message: null,
+    result: null
   }
 }
 

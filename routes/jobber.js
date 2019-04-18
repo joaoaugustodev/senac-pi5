@@ -29,11 +29,6 @@ router.post('/signin', async (req, res) => {
       }
   
       data.password = null
-      // const comments = await Comments.find({idUserJobber: data._id});
-      // console.log("COMMENTS =======>")
-      // console.log(comments)
-      // data.comments = comments;
-
       res.setHeader('token', jwt.sign({ name: data.name }, process.env.PASS_TOKEN))
       res.status(200).json(response.send('successLogin', data))
     })
@@ -77,6 +72,50 @@ router.post('/signup', async (req, res) => {
       error: Object.keys(error.errors).map(item => error.errors[item].message)
     }
   })
+})
+
+router.put('/edit', async (req, res) => {
+  let user = req.body;
+
+  try {
+    const data = await UserJobber.updateMany({_id: user._id}, user);
+    
+    res.status(200).json({
+      statusCode: 200,
+      status: 'OK',
+      message: 'Dados atualizados com sucesso!',
+      result: data
+    })
+  } catch(e) {
+    res.status(200).json({
+      statusCode: 500,
+      status: "Internal Server Error",
+      message: 'Não foi possível completar a operação',
+      result: e
+    })
+  }
+})
+
+router.delete('/delete', async (req, res) => {
+  const userId = req.query.id;
+  
+  try {
+    const data = await UserJobber.deleteMany({_id: userId});
+    
+    res.status(200).json({
+      statusCode: 200,
+      status: "OK",
+      message: 'Usuário removido com sucesso!',
+      result: data
+    })
+  } catch(e) {
+    res.status(500).json({
+      statusCode: 500,
+      status: 'Internal Server Error',
+      message: 'Erro ao remover usuário',
+      result: e
+    })
+  }
 })
 
 module.exports = router
