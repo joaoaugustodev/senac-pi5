@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www",
-    "prod": "node ./bin/www"
+    "prod": "npm i && node ./bin/www"
   },
   "dependencies": {
     "bcrypt": "^3.0.5",
