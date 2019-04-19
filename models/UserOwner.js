@@ -2,8 +2,6 @@ const { Schema, model } = require('mongoose')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
-require('dotenv').config()
-
 const UserOwnerSchema = new Schema({
   name: {
     type: String,
@@ -45,7 +43,7 @@ const UserOwnerSchema = new Schema({
   },
   bankCode:{
     type: String,
-    required: [true, 'O código do banco é obrigatório']   
+    required: [true, 'O código do banco é obrigatório']
   },
   birthday: {
     type: Date,
