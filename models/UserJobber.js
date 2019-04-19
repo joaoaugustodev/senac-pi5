@@ -47,7 +47,7 @@ const UserJobberSchema = new Schema({
   },
   birthday: {
     type: Date,
-    default: Date.now()
+    required: [true, 'A data de aniversário é obrigatória']
   },
   address: {
     type: String,
@@ -74,16 +74,52 @@ const UserJobberSchema = new Schema({
   slidePhoto: {
     type: String
   },
-  // comments: {
-  //   type: Schema.Types.ObjectId,
-  //   ref: 'Comments'
-  // },
-  // typeServices: {
-  //   type: Schema.Types.ObjectId,
-  //   ref: 'TypeServices'
-  // }
-  //faltando (dias de trabalho)
-  // horário inicial e horário final
+  weekDays:{
+    sunday: {
+      type: Boolean,
+      required: true,
+    },
+    monday: {
+      type: Boolean,
+      required: true,
+    },
+    tuesday: {
+      type: Boolean,
+      required: true,
+    },
+    wednesday: {
+      type: Boolean,
+      required: true,
+    },
+    thursday: {
+      type: Boolean,
+      required: true,
+    },
+    friday: {
+      type: Boolean,
+      required: true,
+    },
+    saturday: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  startTime:{
+    type: Date,
+    required: [true, 'O horário inicial é obrigatório.']
+  },
+  endTime:{
+    type: Date,
+    required: [true, 'O horário final é obrigatório.']
+  },
+  comments: {
+    type: Schema.Types.ObjectId,
+    ref: 'Comments'
+  },
+  typeServices: {
+    type: Schema.Types.ObjectId,
+    ref: 'TypeServices'
+  }
 })
 
 UserJobberSchema.pre('save', function (next) {
