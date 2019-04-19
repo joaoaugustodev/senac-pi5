@@ -6,12 +6,15 @@ const UserOwner = require('../models/UserOwner')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
 const verifyToken = require('../middleware/verifyJwt')
+const upload = require('../middleware/upload')
+const helperEdit = require('./helper/helperEdit')
+const uploadPhotos = upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'capaPhoto', maxCount: 1 }])
 
-router.post('/create', verifyToken, async (req, res) => {
+router.post('/create', uploadPhotos, verifyToken, async (req, res) => {
     if (!req.token) {
       return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
     }
-    const data = new animal(req.body)
+    const data = new animal(helperEdit(req.body, req.files))
     const ownerReturn = await UserOwner.findOne({'_id': data.idOwner})
 
     if(ownerReturn != null){
@@ -69,49 +72,47 @@ router.get('/:id', verifyToken, async (req, res) => {
   }
 })
 
-router.put('/edit', async(req, res) => {
-    const dataParam = req.body;
-    /*if (!req.token) {
-      return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
-    }*/
-  
-    const animalReturn = await animal.findOne({'_id': req.query.id})
-
-    if (animalReturn != null){
-
-        animal.findOneAndUpdate({'_id': req.query.id}, dataParam, {upsert : false}, (err, data) => {
-            if (!err) {
-                return res.status(200).json({
-                    statusCode: 200,
-                    status: "OK",
-                    message: 'Dados alterados com sucesso!',
-                    result: data 
-                })
-              } else {
-                res.status(500).json({
-                  statusCode: 500,
-                  status: 'error',
-                  message: 'Não foi possível completar a operação.',
-                  result: err
-                })
-              }
-        })
-
-    }else{
-        return res.status(200).json({
-            statusCode: 404,
-            status: "not found",
-            message: 'Animal não encontrado.',
-            result: null 
-          })
+router.put('/edit/:id', uploadPhotos, verifyToken, async(req, res) => {
+    if (!req.token) {
+      return res.status(401).json(response.send('unauthorized', null, 'O usuário não está autenticado.'))
     }
 
+    const hasUser = await animal.findOne({ _id: req.params.id })
+
+    if (!hasUser) {
+      return res.status(404).json({
+        statusCode: 404,
+        status: "Not Found",
+        message: 'Animal não encontrado.',
+        result: null 
+      })
+    }
+
+    animal.findOneAndUpdate({'_id': req.params.id}, helperEdit(req.body, req.files), {new: true}, (err, data) => {
+      if (err) {
+        return res.status(500).json({
+          statusCode: 500,
+          status: 'error',
+          message: 'Não foi possível completar a operação.',
+          result: err
+        })
+      }
+
+      if(data){
+        return res.status(200).json({
+            statusCode: 200,
+            status: "OK",
+            message: 'Dados alterados com sucesso!',
+            result: data 
+        })
+      }
+  })
 })
 
-router.delete('/delete', async(req, res) => {
-    /*if (!req.token) {
-      return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
-    }*/
+router.delete('/delete', verifyToken, async(req, res) => {
+    if (!req.token) {
+      return res.status(401).json(response.send('unauthorized', null, 'O usuário não está autenticado.'))
+    }
   
     const animalReturn = await animal.findOne({'_id': req.query.id})
 
