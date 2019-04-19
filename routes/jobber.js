@@ -2,16 +2,37 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const UserJobber = require('../models/UserJobber')
-const Comments = require('../models/Comments')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
+const verifyToken = require('../middleware/verifyJwt')
+const upload = require('../middleware/upload')
+const helperEdit = require('./helper/helperEdit')
+const uploadPhotos = upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'capaPhoto', maxCount: 1 }])
 
-router.get('/', async (req, res) => {
-    console.log("ENTREI")
-    const data = await UserJobber.find();
-    const comment = await Comments.find();
-    res.status(200).json({jobbers: data, comments: comment});
-}) 
+router.get('/:id', verifyToken, async (req, res) => {
+  if (!req.token) {
+    return res.status(401).json(response.send('error401', null, 'Usuário não está autenticado.'))
+  }
+
+  try {
+    const data = await UserOwner.findOne({ _id: req.params.id })
+
+    if (!data) {
+      return res
+        .status(404)
+        .json(response.send('error404', null, 'Usuário não encontrado.'))
+    }
+
+    Array.isArray(data) ? data.forEach(item => item.password = null) : data.password = null
+
+    res
+      .status(200)
+      .json(response.send('success', data, 'Usuário encontrado com sucesso.'))
+
+  } catch (e) {
+    res.status(500).json(response.send('error500'))
+  }
+})
 
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body
@@ -27,7 +48,7 @@ router.post('/signin', async (req, res) => {
           .status(403)
           .json(response.send('failLogin', null, 'Login inválido.'))
       }
-  
+
       data.password = null
       res.setHeader('token', jwt.sign({ name: data.name }, process.env.PASS_TOKEN))
       res.status(200).json(response.send('successLogin', data))
@@ -37,8 +58,8 @@ router.post('/signin', async (req, res) => {
   }
 })
 
-router.post('/signup', async (req, res) => {
-  const data = new UserJobber(req.body)
+router.post('/signup', uploadPhotos, async (req, res) => {
+  const data = new UserJobber(helperEdit(req.body, req.files))
 
   if (data && data.email) {
     try {
@@ -61,7 +82,7 @@ router.post('/signup', async (req, res) => {
       data.password = null
       res.setHeader('token', jwt.sign({ name: data.name }, process.env.PASS_TOKEN))
       return res.status(200).json(response.send('success', data, 'Dados inseridos com sucesso.'))
-    });  
+    });
   }
 
   res.status(406).json({
@@ -79,7 +100,7 @@ router.put('/edit', async (req, res) => {
 
   UserJobber.findOneAndUpdate({'_id': data._id}, data, {upsert:false}, async(err, doc) => {
     if (!err) {
-      //get user 
+      //get user
       let user = await UserJobber.findOne({'_id': data._id});
 
       if(user == null) {
@@ -94,7 +115,7 @@ router.put('/edit', async (req, res) => {
         statusCode: 200,
         status: "OK",
         message: 'Dados alterados com sucesso!',
-        result: user 
+        result: user
       })
     }
 
@@ -103,14 +124,14 @@ router.put('/edit', async (req, res) => {
       status: 'error',
       message: 'Não foi possível completar a operação.',
       result: err
-    })  
+    })
   });
 })
 
 router.put('/delete', async (req, res) => {
   const userId = req.query.id;
-  
-  //get user 
+
+  //get user
   let user = await UserJobber.findOne({'_id': userId});
 
   if(user == null) {
@@ -120,22 +141,22 @@ router.put('/delete', async (req, res) => {
       message: 'Esse usuário não existe'
     })
   }
-  
+
   let data = {
     '_id': userId,
     'active': false
   }
-  
+
   UserJobber.findOneAndUpdate({'_id': userId}, data, {upsert: true}, async(err, doc) => {
     if (!err) {
       return res.status(200).json({
         statusCode: 200,
         status: "OK",
         message: 'Dados alterados com sucesso!',
-        result: true 
+        result: true
       })
     }
-    
+
     res.status(500).json({
       statusCode: 500,
       status: 'error',

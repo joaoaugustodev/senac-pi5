@@ -32,12 +32,18 @@ const response = {
   error500: {
     statusCode: 500,
     status: 'Server error',
-    message: 'Ocorreu um erro de serviidor, por favor informe aos desenvolvedores',
+    message: 'Ocorreu um erro de servidor, por favor informe aos desenvolvedores',
     result: null
   },
   error401: {
     statusCode: 401,
     status: 'error request unauthorized',
+    message: null,
+    result: null
+  },
+  error404: {
+    statusCode: 404,
+    status: 'Not Found',
     message: null,
     result: null
   },
