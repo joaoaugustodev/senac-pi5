@@ -4,8 +4,6 @@ const bcrypt = require('bcrypt')
 const Comments = require('./Comments')
 const TypeServices = require('./TypeServices')
 
-require('dotenv').config()
-
 const UserJobberSchema = new Schema({
   name: {
     type: String,
@@ -47,7 +45,7 @@ const UserJobberSchema = new Schema({
   },
   bankCode:{
     type: String,
-    required: [true, 'O código do banco é obrigatório']   
+    required: [true, 'O código do banco é obrigatório']
   },
   birthday: {
     type: Date,
