@@ -29,11 +29,6 @@ router.post('/signin', async (req, res) => {
       }
   
       data.password = null
-      // const comments = await Comments.find({idUserJobber: data._id});
-      // console.log("COMMENTS =======>")
-      // console.log(comments)
-      // data.comments = comments;
-
       res.setHeader('token', jwt.sign({ name: data.name }, process.env.PASS_TOKEN))
       res.status(200).json(response.send('successLogin', data))
     })
@@ -77,6 +72,77 @@ router.post('/signup', async (req, res) => {
       error: Object.keys(error.errors).map(item => error.errors[item].message)
     }
   })
+})
+
+router.put('/edit', async (req, res) => {
+  let data = req.body;
+
+  UserJobber.findOneAndUpdate({'_id': data._id}, data, {upsert:false}, async(err, doc) => {
+    if (!err) {
+      //get user 
+      let user = await UserJobber.findOne({'_id': data._id});
+
+      if(user == null) {
+        res.status(404).json({
+          statusCode: 404,
+          status: 'Not Found',
+          message: 'Esse usuário não existe'
+        })
+      }
+
+      return res.status(200).json({
+        statusCode: 200,
+        status: "OK",
+        message: 'Dados alterados com sucesso!',
+        result: user 
+      })
+    }
+
+    res.status(500).json({
+      statusCode: 500,
+      status: 'error',
+      message: 'Não foi possível completar a operação.',
+      result: err
+    })  
+  });
+})
+
+router.put('/delete', async (req, res) => {
+  const userId = req.query.id;
+  
+  //get user 
+  let user = await UserJobber.findOne({'_id': userId});
+
+  if(user == null) {
+    res.status(404).json({
+      statusCode: 404,
+      status: 'Not Found',
+      message: 'Esse usuário não existe'
+    })
+  }
+  
+  let data = {
+    '_id': userId,
+    'active': false
+  }
+  
+  UserJobber.findOneAndUpdate({'_id': userId}, data, {upsert: true}, async(err, doc) => {
+    if (!err) {
+      return res.status(200).json({
+        statusCode: 200,
+        status: "OK",
+        message: 'Dados alterados com sucesso!',
+        result: true 
+      })
+    }
+    
+    res.status(500).json({
+      statusCode: 500,
+      status: 'error',
+      message: 'Não foi possível completar a operação.',
+      result: err
+    })
+  });
 })
 
 module.exports = router
