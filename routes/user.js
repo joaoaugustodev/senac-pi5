@@ -9,6 +9,31 @@ const upload = require('../middleware/upload')
 const helperEdit = require('./helper/helperEdit')
 const uploadPhotos = upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'capaPhoto', maxCount: 1 }])
 
+router.get('/:id', verifyToken, async (req, res) => {
+  if (!req.token) {
+    return res.status(401).json(response.send('error401', null, 'Usuário não está autenticado.'))
+  }
+
+  try {
+    const data = await UserOwner.findOne({ _id: req.params.id })
+
+    if (!data) {
+      return res
+        .status(404)
+        .json(response.send('error404', null, 'Usuário não encontrado.'))
+    }
+
+    Array.isArray(data) ? data.forEach(item => item.password = null) : data.password = null
+
+    res
+      .status(200)
+      .json(response.send('success', data, 'Usuário encontrado com sucesso.'))
+
+  } catch (e) {
+    res.status(500).json(response.send('error500'))
+  }
+})
+
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body
 
@@ -36,8 +61,8 @@ router.post('/signin', async (req, res) => {
   }
 })
 
-router.post('/signup', async (req, res) => {
-  const data = new UserOwner(req.body)
+router.post('/signup', uploadPhotos, async (req, res) => {
+  const data = new UserOwner(helperEdit(req.body, req.files))
 
   if (data && data.email) {
     try {
@@ -69,7 +94,7 @@ router.post('/signup', async (req, res) => {
 
 router.put('/edit/:id', uploadPhotos, verifyToken, (req, res) => {
   if (!req.token) {
-    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+    return res.status(401).json(response.send('error401', null, 'Usuário não está autenticado.'))
   }
 
   UserOwner.findOneAndUpdate(req.params._id, helperEdit(req.body, req.files), {new: true}, (err, data) => {
@@ -81,7 +106,7 @@ router.put('/edit/:id', uploadPhotos, verifyToken, (req, res) => {
 
 router.delete('/delete/:id', uploadPhotos, verifyToken, (req, res) => {
   if (!req.token) {
-    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+    return res.status(401).json(response.send('error401', null, 'Usuário não está autenticado.'))
   }
 
   UserOwner.findOneAndUpdate(req.params._id, { active: false }, {new: true}, (err, data) => {
