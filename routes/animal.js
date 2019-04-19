@@ -2,32 +2,71 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const animal = require('../models/Animal')
+const UserOwner = require('../models/UserOwner')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
 const verifyToken = require('../middleware/verifyJwt')
 
-router.post('/create', async (req, res) => {
-    const data = new animal(req.body)
-
-    if(!data.validateSync()) {
-        try {
-            let result = await data.save();
-
-            res.status(200).json({
-                statusCode: 200,
-                status: "OK",
-                message: 'Animal criado com sucesso',
-                result: result
-            })
-        } catch(e) {
-            res.status(500).json({
-                statusCode: 500,
-                status: "Internal Server Error",
-                message: "Erro ao inserir animal",
-                error: e
-            })
-        }
+router.post('/create', verifyToken, async (req, res) => {
+    if (!req.token) {
+      return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
     }
+    const data = new animal(req.body)
+    const ownerReturn = await UserOwner.findOne({'_id': data.idOwner})
+
+    if(ownerReturn != null){
+      if(!data.validateSync()) {
+          try {
+              let result = await data.save();
+  
+              res.status(200).json({
+                  statusCode: 200,
+                  status: "OK",
+                  message: 'Animal criado com sucesso',
+                  result: result
+              })
+          } catch(e) {
+              res.status(500).json({
+                  statusCode: 500,
+                  status: "Internal Server Error",
+                  message: "Erro ao inserir animal",
+                  error: e
+              })
+          }
+      }
+    }else{
+      res.status(400).json({
+        statusCode: 400,
+        status: "Inconsistent request",
+        message: 'Request para um tipo de usuário que não existe',
+        result: null
+      })
+    }
+
+})
+
+router.get('/:id', verifyToken, async (req, res) => {
+  
+  if (!req.token) {
+    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+  }
+  const animalId = req.params.id
+  try{
+    const data = await animal.find({'_id': animalId});
+    res.status(200).json({
+        statusCode: 200,
+        status: "OK",
+        message: 'Animal retornado com sucesso',
+        result: data
+    })
+  }catch(e){
+    res.status(500).json({
+        statusCode: 500,
+        status: "Internal Server Error",
+        message: "Erro ao consultar os dados do animal solicitado",
+        error: e
+    })
+  }
 })
 
 router.put('/edit', async(req, res) => {
@@ -97,7 +136,7 @@ router.delete('/delete', async(req, res) => {
         })
 
     }else{
-        return res.status(200).json({
+        return res.status(404).json({
             statusCode: 404,
             status: "not found",
             message: 'Animal não encontrado.',
@@ -108,5 +147,3 @@ router.delete('/delete', async(req, res) => {
 })
 
 module.exports = router
-
-//necessário verificar se o owner existe
