@@ -5,7 +5,9 @@ const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const cors = require('cors')
 
-require('dotenv').config()
+if (process.env.DEPLOY !== 'production') {
+  require('dotenv').config()
+}
 require('./bin/connection')
 
 const app = express()
