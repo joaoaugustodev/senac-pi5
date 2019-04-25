@@ -81,25 +81,36 @@ router.put('/edit', verifyToken, async (req, res) => {
     return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
   }
 
-  let user = req.body;
+  let data = req.body;
 
-  try {
-    const data = await UserJobber.updateMany({_id: user._id}, user);
-    
-    res.status(200).json({
-      statusCode: 200,
-      status: 'OK',
-      message: 'Dados atualizados com sucesso!',
-      result: data
-    })
-  } catch(e) {
-    res.status(200).json({
+  UserJobber.findOneAndUpdate({'_id': data._id}, data, {upsert:false}, async(err, doc) => {
+    if (!err) {
+      //get user 
+      let user = await UserJobber.findOne({'_id': data._id});
+
+      if(user == null) {
+        res.status(404).json({
+          statusCode: 404,
+          status: 'Not Found',
+          message: 'Esse usuário não existe'
+        })
+      }
+
+      return res.status(200).json({
+        statusCode: 200,
+        status: "OK",
+        message: 'Dados alterados com sucesso!',
+        result: user 
+      })
+    }
+
+    res.status(500).json({
       statusCode: 500,
-      status: "Internal Server Error",
-      message: 'Não foi possível completar a operação',
-      result: e
-    })
-  }
+      status: 'error',
+      message: 'Não foi possível completar a operação.',
+      result: err
+    })  
+  });
 })
 
 router.delete('/delete', verifyToken, async (req, res) => {
@@ -110,23 +121,39 @@ router.delete('/delete', verifyToken, async (req, res) => {
   
   const userId = req.query.id;
   
-  try {
-    const data = await UserJobber.deleteMany({_id: userId});
-    
-    res.status(200).json({
-      statusCode: 200,
-      status: "OK",
-      message: 'Usuário removido com sucesso!',
-      result: data
-    })
-  } catch(e) {
-    res.status(500).json({
-      statusCode: 500,
-      status: 'Internal Server Error',
-      message: 'Erro ao remover usuário',
-      result: e
+  //get user 
+  let user = await UserJobber.findOne({'_id': userId});
+
+  if(user == null) {
+    res.status(404).json({
+      statusCode: 404,
+      status: 'Not Found',
+      message: 'Esse usuário não existe'
     })
   }
+  
+  let data = {
+    '_id': userId,
+    'active': false
+  }
+  
+  UserJobber.findOneAndUpdate({'_id': userId}, data, {upsert: true}, async(err, doc) => {
+    if (!err) {
+      return res.status(200).json({
+        statusCode: 200,
+        status: "OK",
+        message: 'Dados alterados com sucesso!',
+        result: true 
+      })
+    }
+    
+    res.status(500).json({
+      statusCode: 500,
+      status: 'error',
+      message: 'Não foi possível completar a operação.',
+      result: err
+    })
+  });
 })
 
 module.exports = router

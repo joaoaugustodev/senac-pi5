@@ -19,6 +19,10 @@ const UserJobberSchema = new Schema({
     type: String,
     required: [true, 'A senha não foi informado']
   },
+  active: {
+    type: Boolean,
+    required: [true]
+  },
   description: {
     type: String
   },
@@ -40,6 +44,10 @@ const UserJobberSchema = new Schema({
   agency: {
     type: String,
     required: [true, 'Agência da conta é obrigatória']
+  },
+  bankCode:{
+    type: String,
+    required: [true, 'O código do banco é obrigatório']   
   },
   birthday: {
     type: Date,

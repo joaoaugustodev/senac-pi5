@@ -91,5 +91,49 @@ router.delete('/delete/:id', uploadPhotos, verifyToken, (req, res) => {
   })
 })
 
+router.put('/credit/:id/:value', uploadPhotos, verifyToken, async (req, res) => {
+  if (!req.token) {
+    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+  }
+
+  const userId = req.params.id
+  const creditValue = (parseInt(req.params.value) > 0) ? parseInt(req.params.value) : 0 
+  let updatedCredit = 0
+
+  try{
+    const user = await UserOwner.findOne({'_id': userId});
+    updatedCredit = parseInt(user.qtdCredit) + parseInt(creditValue)
+
+    console.log('credit:', user)
+
+  }catch(err){
+    res.status(500).json({
+      statusCode: 500,
+      status: "Internal Server Error",
+      message: "Erro ao consultar os dados do usuário",
+      error: err
+    })
+  }
+
+
+  UserOwner.findOneAndUpdate({'_id': userId}, { qtdCredit: updatedCredit }, {new: true}, async(err, data) => {
+    if (!err) {
+        return res.status(200).json({
+            statusCode: 200,
+            status: "OK",
+            message: 'Dados alterados com sucesso!',
+            result: data 
+        })
+      } else {
+        res.status(500).json({
+          statusCode: 500,
+          status: 'error',
+          message: 'Não foi possível completar a operação.',
+          result: err
+        })
+      }
+  })
+})
+
 module.exports = router
 
