@@ -4,9 +4,13 @@ const bcrypt = require('bcrypt')
 const service = require('../models/Services')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
-//const verifyToken = require('../middleware/verifyJwt')
+const verifyToken = require('../middleware/verifyJwt')
 
-router.post('/create', async (req, res) => {
+router.post('/create', verifyToken, async (req, res) => {
+    if (!req.token) {
+        return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+    }
+
     const data = new service(req.body)
 
     if(!data.validateSync()) {

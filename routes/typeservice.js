@@ -3,8 +3,14 @@ const router = express.Router()
 const bcrypt = require('bcrypt')
 const typeservice = require('../models/TypeServices')
 const response = require('../models/Helpers/ResponseDefault')
+const verifyToken = require('../middleware/verifyJwt')
 
-router.post('/create', async (req, res) => {
+router.post('/create', verifyToken, async (req, res) => {
+
+    if (!req.token) {
+        return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+    }
+
     const data = new typeservice(req.body)
 
     if(!data.validateSync()) {
@@ -28,7 +34,12 @@ router.post('/create', async (req, res) => {
     }
 })
 
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, async (req, res) => {
+
+    if (!req.token) {
+        return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+    }
+    
     try{
         const data = await typeservice.find();
         res.status(200).json({
