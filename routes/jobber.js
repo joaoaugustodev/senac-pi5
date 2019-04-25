@@ -5,6 +5,7 @@ const UserJobber = require('../models/UserJobber')
 const Comments = require('../models/Comments')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
+const verifyToken = require('../middleware/verifyJwt')
 
 router.get('/', async (req, res) => {
     console.log("ENTREI")
@@ -74,7 +75,12 @@ router.post('/signup', async (req, res) => {
   })
 })
 
-router.put('/edit', async (req, res) => {
+router.put('/edit', verifyToken, async (req, res) => {
+
+  if (!req.token) {
+    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+  }
+
   let user = req.body;
 
   try {
@@ -96,7 +102,12 @@ router.put('/edit', async (req, res) => {
   }
 })
 
-router.delete('/delete', async (req, res) => {
+router.delete('/delete', verifyToken, async (req, res) => {
+
+  if (!req.token) {
+    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+  }
+  
   const userId = req.query.id;
   
   try {
