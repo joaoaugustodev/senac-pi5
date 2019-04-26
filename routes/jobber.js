@@ -95,7 +95,12 @@ router.post('/signup', uploadPhotos, async (req, res) => {
   })
 })
 
-router.put('/edit', async (req, res) => {
+router.put('/edit', verifyToken, async (req, res) => {
+
+  if (!req.token) {
+    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+  }
+
   let data = req.body;
 
   UserJobber.findOneAndUpdate({'_id': data._id}, data, {upsert:false}, async(err, doc) => {
@@ -128,7 +133,12 @@ router.put('/edit', async (req, res) => {
   });
 })
 
-router.put('/delete', async (req, res) => {
+router.delete('/delete', verifyToken, async (req, res) => {
+
+  if (!req.token) {
+    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+  }
+  
   const userId = req.query.id;
 
   //get user
