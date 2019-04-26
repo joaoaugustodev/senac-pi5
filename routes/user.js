@@ -86,9 +86,7 @@ router.post('/signup', uploadPhotos, async (req, res) => {
     statusCode: 406,
     status: 'error not acceptable',
     message: 'Dados inconsistentes.',
-    result: {
-      error: Object.keys(error.errors).map(item => error.errors[item].message)
-    }
+    result: null
   })
 })
 
