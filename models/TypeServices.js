@@ -5,6 +5,10 @@ const typeServicesSchema = new Schema({
     type: String,
     required: true,
   },
+  idUserJobber: {
+    type: Schema.Types.ObjectId,
+    ref: 'UserJobber'
+  },
   description: {
     type: String,
     required: true
