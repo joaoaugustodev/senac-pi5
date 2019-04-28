@@ -148,9 +148,9 @@ router.delete('/delete', verifyToken, async(req, res) => {
 })
 
 router.get('/useranimals/:id', verifyToken, async (req, res) =>{
-  /*if (!req.token) {
+  if (!req.token) {
     return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
-  }*/
+  }
   const ownerId = req.params.id
   const ownerReturn = await UserOwner.findOne({'_id': req.params.id})
 
