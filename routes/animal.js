@@ -167,7 +167,7 @@ router.get('/useranimals/:id', verifyToken, async (req, res) =>{
       res.status(500).json({
           statusCode: 500,
           status: "Internal Server Error",
-          message: "Erro ao consultar o animais do dono informado",
+          message: "Erro ao consultar os animais do dono informado",
           error: e
       })
     }
@@ -175,7 +175,7 @@ router.get('/useranimals/:id', verifyToken, async (req, res) =>{
     res.status(400).json({
       statusCode: 400,
       status: "Inconsistent request",
-      message: 'Request para um tipo de usuário que não existe',
+      message: 'Request para um usuário que não existe',
       result: null
     }) 
   }
