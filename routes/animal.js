@@ -147,38 +147,4 @@ router.delete('/delete', verifyToken, async(req, res) => {
 
 })
 
-router.get('/useranimals/:id', verifyToken, async (req, res) =>{
-  if (!req.token) {
-    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
-  }
-  const ownerId = req.params.id
-  const ownerReturn = await UserOwner.findOne({'_id': req.params.id})
-
-  if(ownerReturn != null){
-    try{
-      const data = await animal.find({'idOwner': ownerId});
-      res.status(200).json({
-          statusCode: 200,
-          status: "OK",
-          message: 'Animais retornados com sucesso',
-          result: data
-      })
-    }catch(e){
-      res.status(500).json({
-          statusCode: 500,
-          status: "Internal Server Error",
-          message: "Erro ao consultar os animais do dono informado",
-          error: e
-      })
-    }
-  }else{
-    res.status(400).json({
-      statusCode: 400,
-      status: "Inconsistent request",
-      message: 'Request para um usuário que não existe',
-      result: null
-    }) 
-  }
-})
-
 module.exports = router
