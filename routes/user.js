@@ -203,7 +203,7 @@ router.get('/comments/:id', verifyToken, async (req, res) =>{
 
   if(ownerReturn != null){
     try{
-      const data = await comments.find({'idUserOwner': ownerId});
+      const data = await comments.find({'idUserOwner': ownerId, 'direction': "JO"});
       res.status(200).json({
           statusCode: 200,
           status: "OK",
