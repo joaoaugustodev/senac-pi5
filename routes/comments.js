@@ -88,7 +88,7 @@ router.put('/edit/:id', verifyToken, async(req, res) => {
     const hasOwner = await comments.findOne({ idUserOwner: editData.idUserOwner })
     const hasJobber = await comments.findOne({ idUserJobber: editData.idUserJobber })
 
-    if (!hasComment || !hasOwner || !hasJobber) {
+    if (!hasComment || !hasOwner || !hasJ) {
       return res.status(404).json({
         statusCode: 404,
         status: "Not Found",
@@ -97,8 +97,7 @@ router.put('/edit/:id', verifyToken, async(req, res) => {
       })
     }
 
-    //Alguma coisa errada neste trecho abaixo
-    comments.findOneAndUpdate({'_id': req.params.id},{editData}, {new: true}, (err, data) => {
+    comments.findOneAndUpdate({'_id': req.params.id},{$set: editData}, (err, data) => {
         if (err) {
             return res.status(500).json({
             statusCode: 500,
