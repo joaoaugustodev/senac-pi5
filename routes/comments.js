@@ -33,33 +33,6 @@ router.post('/create', verifyToken, async (req, res) => {
             
             try {
                 let result = await data.save();
-                
-                if(data.direction === "OJ"){
-                    //Necessário fazer o update da nota do owner
-
-                    /*const resultadoQtd = await comments.count({direction:"OJ",idUserOwner:data.idUserJobber})
-                    console.log(resultadoQtd)
-
-                    //=========AGREGATE AINDA NAO ESTA RETORNANDO OQUE EU QUERO==========
-                    const resultadoSum = await comments.aggregate([
-                        {$match:{
-                            direction: "OJ",
-                            idUserJobber: data.idUserJobber
-                        }},
-                        {$group:{
-                            _id: null,
-                            total: {$sum: "$rate"}
-                            }
-                        }
-                    ])
-                    console.log(resultadoSum)*/
-
-                    //const valorCalculado = resultadoSum/resultadoQtd
-                    //UserOwner.findOneAndUpdate({'_id': data.idUserOwner}, { rate: valorCalculado }, {new: true})
-    
-                }else{
-                    //Necessário fazer o update da nota do jobber
-                }
 
                 return res.status(200).json({
                     statusCode: 200,
@@ -83,21 +56,9 @@ router.put('/edit/:id', verifyToken, async(req, res) => {
     if (!req.token) {
       return res.status(401).json(response.send('unauthorized', null, 'O usuário não está autenticado.'))
     }
-    const editData = new comments(req.body)
-    const hasComment = await comments.findOne({ _id: req.params.id })
-    const hasOwner = await comments.findOne({ idUserOwner: editData.idUserOwner })
-    const hasJobber = await comments.findOne({ idUserJobber: editData.idUserJobber })
+    let data = req.body;
 
-    if (!hasComment || !hasOwner || !hasJ) {
-      return res.status(404).json({
-        statusCode: 404,
-        status: "Not Found",
-        message: 'Comentario ou usuarios não encontrados.',
-        result: null 
-      })
-    }
-
-    comments.findOneAndUpdate({'_id': req.params.id},{$set: editData}, (err, data) => {
+    comments.findOneAndUpdate({'_id': req.params.id}, data, {upsert:false}, async(err, returnData) => {
         if (err) {
             return res.status(500).json({
             statusCode: 500,
@@ -106,12 +67,49 @@ router.put('/edit/:id', verifyToken, async(req, res) => {
             result: err
             })
         }
-        data.save()
+
+        let comment = await comments.findOne({'_id': req.params.id});
+
+        //Fazer o update da nota aqui
+
+        if(comment.direction === "OJ"){
+            //Necessário fazer o update da nota do owner
+
+            const resultadoQtd = await comments.count({direction:"OJ",idUserJobber: comment.idUserJobber})
+
+            const resultadoSum = await comments.aggregate([
+                {$match:{
+                    direction: "OJ",
+                    idUserJobber: comment.idUserJobber
+                }},
+                {$group:{
+                    _id: null,
+                    total: {$sum: "$rate"}
+                    }
+                }
+            ])
+
+            const valorCalculado = Math.round(Number(resultadoSum[0].total)/Number(resultadoQtd))
+            UserJobber.findOneAndUpdate({'_id': comment.idUserJobber}, { rate: valorCalculado }, {upsert: true})
+
+        }else{
+            const resultadoQtd = await comments.count({direction:"JO",idUserOwner: comment.idUserOwner})
+            console.log(resultadoQtd)
+        }
+
+        if(comment == null) {
+            res.status(404).json({
+              statusCode: 404,
+              status: 'Not Found',
+              message: 'Esse comentario nao existe'
+            })
+        }
+    
         return res.status(200).json({
             statusCode: 200,
             status: "OK",
             message: 'Dados alterados com sucesso!',
-            result: data 
+            result: comment 
         })
     })
 })

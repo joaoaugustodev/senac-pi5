@@ -23,7 +23,8 @@ const UserOwnerSchema = new Schema({
     type: String
   },
   rate: {
-    type: Number
+    type: Number,
+    default: 0
   },
   qtdCredit: {
     type: Number,
