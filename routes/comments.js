@@ -70,13 +70,16 @@ router.put('/edit/:id', verifyToken, async(req, res) => {
 
         let comment = await comments.findOne({'_id': req.params.id});
 
-        //Fazer o update da nota aqui
+        if(comment == null) {
+            res.status(404).json({
+              statusCode: 404,
+              status: 'Not Found',
+              message: 'Esse comentario nao existe'
+            })
+        }
 
         if(comment.direction === "OJ"){
-            //Necessário fazer o update da nota do owner
-
             const resultadoQtd = await comments.count({direction:"OJ",idUserJobber: comment.idUserJobber})
-
             const resultadoSum = await comments.aggregate([
                 {$match:{
                     direction: "OJ",
@@ -88,29 +91,57 @@ router.put('/edit/:id', verifyToken, async(req, res) => {
                     }
                 }
             ])
-
             const valorCalculado = Math.round(Number(resultadoSum[0].total)/Number(resultadoQtd))
-            UserJobber.findOneAndUpdate({'_id': comment.idUserJobber}, { rate: valorCalculado }, {upsert: true})
-
+            UserJobber.findOneAndUpdate({'_id': comment.idUserJobber}, { rate: valorCalculado }, {upsert: true}, async(errRate,returnRate) => {
+                if(errRate){
+                    return res.status(500).json({
+                        statusCode: 500,
+                        status: 'error',
+                        message: 'Não foi possível completar a operação.',
+                        result: errRate
+                    })              
+                }else{
+                    return res.status(200).json({
+                        statusCode: 200,
+                        status: "OK",
+                        message: 'Dados alterados com sucesso!',
+                        result: comment 
+                    })
+                }
+            })
         }else{
             const resultadoQtd = await comments.count({direction:"JO",idUserOwner: comment.idUserOwner})
-            console.log(resultadoQtd)
-        }
-
-        if(comment == null) {
-            res.status(404).json({
-              statusCode: 404,
-              status: 'Not Found',
-              message: 'Esse comentario nao existe'
+            const resultadoSum = await comments.aggregate([
+                {$match:{
+                    direction: "JO",
+                    idUserOwner: comment.idUserOwner
+                }},
+                {$group:{
+                    _id: null,
+                    total: {$sum: "$rate"}
+                }
+                }
+            ])
+            const valorCalculado = Math.round(Number(resultadoSum[0].total)/Number(resultadoQtd))
+            UserOwner.findOneAndUpdate({'_id': comment.idUserOwner}, { rate: valorCalculado }, {upsert: true}, async(errRate,returnRate) => {
+                if(errRate){
+                    return res.status(500).json({
+                        statusCode: 500,
+                        status: 'error',
+                        message: 'Não foi possível completar a operação.',
+                        result: errRate
+                    })              
+                }else{
+                    return res.status(200).json({
+                        statusCode: 200,
+                        status: "OK",
+                        message: 'Dados alterados com sucesso!',
+                        result: comment 
+                    })
+                }
             })
         }
     
-        return res.status(200).json({
-            statusCode: 200,
-            status: "OK",
-            message: 'Dados alterados com sucesso!',
-            result: comment 
-        })
     })
 })
 
