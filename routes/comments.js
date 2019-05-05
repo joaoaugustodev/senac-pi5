@@ -33,13 +33,71 @@ router.post('/create', verifyToken, async (req, res) => {
             
             try {
                 let result = await data.save();
+                let comment = await comments.findOne({'_id': result._id});
 
-                return res.status(200).json({
-                    statusCode: 200,
-                    status: "OK",
-                    message: 'Comentário criado com sucesso',
-                    result: result
-                })
+                if(comment.direction === "OJ"){
+                    const resultadoQtd = await comments.count({direction:"OJ",idUserJobber: comment.idUserJobber})
+                    const resultadoSum = await comments.aggregate([
+                        {$match:{
+                            direction: "OJ",
+                            idUserJobber: comment.idUserJobber
+                        }},
+                        {$group:{
+                            _id: null,
+                            total: {$sum: "$rate"}
+                            }
+                        }
+                    ])
+                    const valorCalculado = Math.round(Number(resultadoSum[0].total)/Number(resultadoQtd))
+                    UserJobber.findOneAndUpdate({'_id': comment.idUserJobber}, { rate: valorCalculado }, {upsert: true}, async(errRate,returnRate) => {
+                        if(errRate){
+                            return res.status(500).json({
+                                statusCode: 500,
+                                status: 'error',
+                                message: 'Não foi possível completar a operação.',
+                                result: errRate
+                            })              
+                        }else{
+                            return res.status(200).json({
+                                statusCode: 200,
+                                status: "OK",
+                                message: 'Comentario criado com sucesso!',
+                                result: comment 
+                            })
+                        }
+                    })
+                }else{
+                    const resultadoQtd = await comments.count({direction:"JO",idUserOwner: comment.idUserOwner})
+                    const resultadoSum = await comments.aggregate([
+                        {$match:{
+                            direction: "JO",
+                            idUserOwner: comment.idUserOwner
+                        }},
+                        {$group:{
+                            _id: null,
+                            total: {$sum: "$rate"}
+                        }
+                        }
+                    ])
+                    const valorCalculado = Math.round(Number(resultadoSum[0].total)/Number(resultadoQtd))
+                    UserOwner.findOneAndUpdate({'_id': comment.idUserOwner}, { rate: valorCalculado }, {upsert: true}, async(errRate,returnRate) => {
+                        if(errRate){
+                            return res.status(500).json({
+                                statusCode: 500,
+                                status: 'error',
+                                message: 'Não foi possível completar a operação.',
+                                result: errRate
+                            })              
+                        }else{
+                            return res.status(200).json({
+                                statusCode: 200,
+                                status: "OK",
+                                message: 'Comentario criado com sucesso!',
+                                result: comment 
+                            })
+                        }
+                    })
+                }
             } catch(e) {
                 return res.status(500).json({
                     statusCode: 500,
@@ -141,7 +199,6 @@ router.put('/edit/:id', verifyToken, async(req, res) => {
                 }
             })
         }
-    
     })
 })
 
