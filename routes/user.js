@@ -169,7 +169,7 @@ router.get('/animals/:id', verifyToken, async (req, res) =>{
 
   if(ownerReturn != null){
     try{
-      const data = await animal.find({'idOwner': ownerId});
+      const data = await animal.find({'idOwner': ownerId, 'status': true});
       res.status(200).json({
           statusCode: 200,
           status: "OK",
