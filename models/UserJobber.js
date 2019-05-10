@@ -52,10 +52,6 @@ const UserJobberSchema = new Schema({
     type: Date,
     required: [true, 'A data de aniversário é obrigatória']
   },
-  address: {
-    type: String,
-    required: [true, 'Endereço é obrigatório']
-  },
   lat: {
     type: Number,
     required: [true, 'Latitude é obrigatório']
@@ -108,11 +104,11 @@ const UserJobberSchema = new Schema({
     },
   },
   startTime:{
-    type: Date,
+    type: Number,
     required: [true, 'O horário inicial é obrigatório.']
   },
   endTime:{
-    type: Date,
+    type: Number,
     required: [true, 'O horário final é obrigatório.']
   },
   comments: {
