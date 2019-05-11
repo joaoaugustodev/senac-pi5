@@ -25,7 +25,8 @@ const UserJobberSchema = new Schema({
     type: String
   },
   rate: {
-    type: Number
+    type: Number,
+    default: 0
   },
   qtdCredit: {
     type: Number,
@@ -50,10 +51,6 @@ const UserJobberSchema = new Schema({
   birthday: {
     type: Date,
     required: [true, 'A data de aniversário é obrigatória']
-  },
-  address: {
-    type: String,
-    required: [true, 'Endereço é obrigatório']
   },
   lat: {
     type: Number,
@@ -107,11 +104,11 @@ const UserJobberSchema = new Schema({
     },
   },
   startTime:{
-    type: Date,
+    type: Number,
     required: [true, 'O horário inicial é obrigatório.']
   },
   endTime:{
-    type: Date,
+    type: Number,
     required: [true, 'O horário final é obrigatório.']
   },
   comments: {

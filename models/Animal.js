@@ -13,9 +13,6 @@ const animalSchema = new Schema({
     type: String,
     required: true
   },
-  animalRegister: {
-    type: String
-  },
   description: {
     type: String
   },

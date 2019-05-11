@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const UserJobber = require('../models/UserJobber')
+const comments = require('../models/Comments')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
 const verifyToken = require('../middleware/verifyJwt')
@@ -174,6 +175,40 @@ router.delete('/delete', verifyToken, async (req, res) => {
       result: err
     })
   });
+})
+
+router.get('/comments/:id', verifyToken, async (req, res) =>{
+  if (!req.token) {
+    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+  }
+  const jobberId = req.params.id
+  const jobberReturn = await UserJobber.findOne({'_id': req.params.id})
+
+  if(jobberReturn != null){
+    try{
+      const data = await comments.find({'idUserJobber': jobberId, 'direction': "OJ"});
+      res.status(200).json({
+          statusCode: 200,
+          status: "OK",
+          message: 'Comentarios retornados com sucesso',
+          result: data
+      })
+    }catch(e){
+      res.status(500).json({
+          statusCode: 500,
+          status: "Internal Server Error",
+          message: "Erro ao consultar os comentarios do usuario informado",
+          error: e
+      })
+    }
+  }else{
+    res.status(400).json({
+      statusCode: 400,
+      status: "Inconsistent request",
+      message: 'Request para um usuario que não existe',
+      result: null
+    }) 
+  }
 })
 
 module.exports = router
