@@ -7,19 +7,23 @@ const TypeServices = require('./TypeServices')
 const servicesSchema = new Schema({
   idUserOwner: {
     type: Schema.Types.ObjectId,
-    ref: 'UserOwner'
+    ref: 'UserOwner',
+    required: true
   },
   idUserJobber: {
     type: Schema.Types.ObjectId,
-    ref: 'UserJobber'
+    ref: 'UserJobber',
+    required: true
   },
   idTypeService: {
     type: Schema.Types.ObjectId,
-    ref: 'TypeServices'
+    ref: 'TypeServices',
+    required: true
   },
   idAnimal: {
     type: Schema.Types.ObjectId,
-    ref: 'Animal'
+    ref: 'Animal',
+    required: true
   },
   date: {
     type: Date,
@@ -35,7 +39,7 @@ const servicesSchema = new Schema({
   },
   serviceStatus: {
     type: String,
-    default: 'solicitado'
+    default: 'solicitado' //solicitado - cancelado - executado
   }
 })
 
