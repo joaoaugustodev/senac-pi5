@@ -36,16 +36,16 @@ const newJobber = {
     "lng": -46.581368,
     "phone": "1155480000",
     "weekDays": {
-        "sunday": true,
-        "monday": true,
-        "tuesday": true,
-        "wednesday": true,
-        "thursday": false,
-        "friday": false,
-        "saturday": false
+        "sunday": "true",
+        "monday": "true",
+        "tuesday": "true",
+        "wednesday": "true",
+        "thursday": "false",
+        "friday": "false",
+        "saturday": "false"
     },
-    "startTime": 12,
-    "endTime": 18
+    "startTime": "12",
+    "endTime": "18"
 }
 
 let jobberId = ''
