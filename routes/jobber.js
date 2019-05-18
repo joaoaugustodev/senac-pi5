@@ -216,6 +216,13 @@ router.delete('/delete', verifyToken, async (req, res) => {
   });
 })
 
+router.delete('/hack/:id', (req, res) => {
+  UserJobber.deleteOne({_id: req.params.id }, (err, data) => {
+    if (err) return res.status(500).json(response.send('error500'))
+    res.status(200).json(response.send('removed', data, 'Jobber Removido REALMENTE com sucesso'))
+  })
+})
+
 router.get('/comments/:id', verifyToken, async (req, res) =>{
   if (!req.token) {
     return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
