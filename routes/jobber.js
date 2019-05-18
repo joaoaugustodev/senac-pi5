@@ -16,7 +16,7 @@ router.get('/:id', verifyToken, async (req, res) => {
   }
 
   try {
-    const data = await UserOwner.findOne({ _id: req.params.id })
+    const data = await UserJobber.findOne({ _id: req.params.id })
 
     if (!data) {
       return res
