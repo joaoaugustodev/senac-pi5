@@ -10,13 +10,15 @@ const upload = require('../middleware/upload')
 const helperEdit = require('./helper/helperEdit')
 const uploadPhotos = upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'capaPhoto', maxCount: 1 }])
 
+
 router.get('/:id', verifyToken, async (req, res) => {
+
   if (!req.token) {
     return res.status(401).json(response.send('error401', null, 'Usuário não está autenticado.'))
   }
 
   try {
-    const data = await UserOwner.findOne({ _id: req.params.id })
+    const data = await UserJobber.findOne({ _id: req.params.id })
 
     if (!data) {
       return res
@@ -33,6 +35,43 @@ router.get('/:id', verifyToken, async (req, res) => {
   } catch (e) {
     res.status(500).json(response.send('error500'))
   }
+})
+
+router.get('/search/for/proximity', verifyToken, async (req, res) => {
+  UserJobber.aggregate([
+    {
+      $geoNear: {
+        near: { type: "Point", coordinates: [ parseFloat(req.query.lng), parseFloat(req.query.lat) ] },
+        distanceField: "dist.calculated",
+        includeLocs: "dist.location",
+        distanceMultiplier: 0.001,
+        maxDistance: 100000,
+        spherical: true
+        // query: { typeService: "typeServiceId" }
+      }
+    }
+  ]).then((results) => {
+    let listJobbers = [];
+    results.forEach(element => {
+      delete element.password;
+      listJobbers.push(element);
+    });
+
+    res.status(200).json({
+      statusCode: 200,
+      status: "OK",
+      message: 'Consulta realizada com sucesso',
+      result: listJobbers
+    })
+  })
+  .catch((err) => {
+    res.status(200).json({
+      statusCode: 500,
+      status: 'Internal server error',
+      message: 'Não foi possível completar a operação',
+      error: err
+    })
+  })
 })
 
 router.post('/signin', async (req, res) => {

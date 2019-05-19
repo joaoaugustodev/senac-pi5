@@ -4,6 +4,17 @@ const bcrypt = require('bcrypt')
 const Comments = require('./Comments')
 const TypeServices = require('./TypeServices')
 
+const GeoSchema = new Schema({
+  type: {
+      type: String,
+      default: "Point"
+  },
+  coordinates: {
+      type: [Number],
+      index: "2dsphere"
+  }
+})
+
 const UserJobberSchema = new Schema({
   name: {
     type: String,
@@ -52,14 +63,9 @@ const UserJobberSchema = new Schema({
     type: Date,
     required: [true, 'A data de aniversário é obrigatória']
   },
-  lat: {
-    type: Number,
-    required: [true, 'Latitude é obrigatório']
-  },
-  lng: {
-    type: Number,
-    required: [true, 'Longitude é obrigatório']
-  },
+  
+  geometry: GeoSchema,
+
   phone: {
     type: String
   },
