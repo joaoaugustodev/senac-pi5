@@ -52,6 +52,7 @@ let jobberId = ''
 let typeServiceId = ''
 let commentOJId = ''
 let commentJOId = ''
+let serviceId = ''
 
 const newAnimal = {
     "idOwner": userId,
@@ -152,10 +153,14 @@ test('Criação de Serviço - retorno 200', ()=>{
     .post('/service/create')
     .set('Authorization', 'Bearer ' + token)
     .send({
-        
+        "idUserOwner": userId,
+        "idUserJobber": jobberId,
+        "idTypeService": typeServiceId,
+        "idAnimal": animalId,
+        "date": "1554564513464",
     })
     .then(response=>{
-        animalId = response.body.result._id
+        serviceId = response.body.result._id
         expect(response.status).toBe(200)
     }).catch(fail)
 })
@@ -370,6 +375,14 @@ test('Delete de Comentario OJ Hack- retorno 200', ()=>{
 test('Delete de Comentario JO Hack- retorno 200', ()=>{
     return request(endPoint)
     .delete('/comments/hack/' + commentJOId)
+    .then(response=>{
+        expect(response.status).toBe(200)
+    }).catch(fail)
+})
+
+test('Delete de Serviço Hack- retorno 200', ()=>{
+    return request(endPoint)
+    .delete('/service/hack/' + serviceId)
     .then(response=>{
         expect(response.status).toBe(200)
     }).catch(fail)
