@@ -42,22 +42,29 @@ router.post('/signin', async (req, res) => {
   try {
     const data = await UserOwner.findOne({ email })
 
-    UserOwner.findOneAndUpdate({email}, { active: true }, {new: true}, (err, data) => {
-      if (err) return res.status(500).json(response.send('error500'))
-      data.save()
-    })
+    if(data == null){
+      return res
+            .status(403)
+            .json(response.send('failLogin', null, 'Login inválido.'))
+    }else{
+      UserOwner.findOneAndUpdate({email}, { active: true }, {new: true}, (err, data) => {
+        if (err) return res.status(500).json(response.send('error500'))
+        data.save()
+      })
+  
+      bcrypt.compare(password, data.password, (err, info)  => {
+        if (!data || !info) {
+          return res
+            .status(403)
+            .json(response.send('failLogin', null, 'Login inválido.'))
+        }
+  
+        data.password = null
+        res.setHeader('token', jwt.sign({ name: data.name }, process.env.PASS_TOKEN))
+        res.status(200).json(response.send('successLogin', data))
+      })
+    }
 
-    bcrypt.compare(password, data.password, (err, info)  => {
-      if (!data || !info) {
-        return res
-          .status(403)
-          .json(response.send('failLogin', null, 'Login inválido.'))
-      }
-
-      data.password = null
-      res.setHeader('token', jwt.sign({ name: data.name }, process.env.PASS_TOKEN))
-      res.status(200).json(response.send('successLogin', data))
-    })
   } catch (e) {
     res.status(500).json(response.send('errorLogin'))
   }
