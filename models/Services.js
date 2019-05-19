@@ -27,7 +27,7 @@ const servicesSchema = new Schema({
   },
   date: {
     type: Date,
-    default: Date.now()
+    required: [true, 'A data do serviço é obrigatória']
   },
   ownerServiceConfirmation: {
     type: Boolean,
