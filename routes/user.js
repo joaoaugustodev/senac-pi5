@@ -142,9 +142,6 @@ router.put('/credit/:id/:value', uploadPhotos, verifyToken, async (req, res) => 
   try{
     const user = await UserOwner.findOne({'_id': userId});
     updatedCredit = parseInt(user.qtdCredit) + parseInt(creditValue)
-
-    console.log('credit:', user)
-
   }catch(err){
     res.status(500).json({
       statusCode: 500,

@@ -40,8 +40,6 @@ router.post('/create', verifyToken, async (req, res) => {
     }
 })
 
-
-
 router.put('/edit', verifyToken, async (req, res) => {
     if (!req.token) {
         return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
@@ -143,5 +141,12 @@ router.put('/edit', verifyToken, async (req, res) => {
     })
 
 })
+
+router.delete('/hack/:id', (req, res) => {
+    service.deleteOne({_id: req.params.id }, (err, data) => {
+      if (err) return res.status(500).json(response.send('error500'))
+      res.status(200).json(response.send('removed', data, 'Serviço Removido REALMENTE com sucesso'))
+    })
+  })
 
 module.exports = router

@@ -202,4 +202,11 @@ router.put('/edit/:id', verifyToken, async(req, res) => {
     })
 })
 
+router.delete('/hack/:id', (req, res) => {
+    comments.deleteOne({_id: req.params.id }, (err, data) => {
+      if (err) return res.status(500).json(response.send('error500'))
+      res.status(200).json(response.send('removed', data, 'Comentário Removido REALMENTE com sucesso'))
+    })
+  })
+
 module.exports = router

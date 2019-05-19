@@ -7,7 +7,6 @@ const response = require('../models/Helpers/ResponseDefault')
 const verifyToken = require('../middleware/verifyJwt')
 
 router.post('/create', verifyToken, async (req, res) => {
-    console.log("entrei no create")
     if (!req.token) {
         return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
     }
@@ -76,5 +75,12 @@ router.get('/:id', verifyToken, async (req, res) => {
         }) 
     }
 })
+
+router.delete('/hack/:id', (req, res) => {
+    typeservice.deleteOne({_id: req.params.id }, (err, data) => {
+      if (err) return res.status(500).json(response.send('error500'))
+      res.status(200).json(response.send('removed', data, 'TypeService Removido REALMENTE com sucesso'))
+    })
+  })
 
 module.exports = router
