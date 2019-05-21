@@ -1,8 +1,8 @@
 import 'jest'
 import * as request from 'supertest'
 
-const endPoint = 'localhost:3000'
-//const endPoint = 'https://cc8077f0.ngrok.io'
+//const endPoint = 'localhost:3000'
+const endPoint = 'https://f8eda98b.ngrok.io'
 const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTWFyY2VsbyIsImlhdCI6MTU1NzQ0MDE1Nn0.rILKnhwrVXCgW4vdorpzpBHlLaiJWjBLyDRhSP8rk2s"
 
 const newUser = {
