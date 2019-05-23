@@ -38,6 +38,9 @@ router.get('/:id', verifyToken, async (req, res) => {
 })
 
 router.get('/search/for/proximity', verifyToken, async (req, res) => {
+  console.log(req.query.typeService)
+  console.log(typeof req.query.typeService)
+  console.log({ typeServices: { name: req.query.typeService } })
   UserJobber.aggregate([
     {
       $geoNear: {
@@ -46,8 +49,8 @@ router.get('/search/for/proximity', verifyToken, async (req, res) => {
         includeLocs: "dist.location",
         distanceMultiplier: 0.001,
         maxDistance: 100000,
-        spherical: true
-        // query: { typeService: "typeServiceId" }
+        spherical: true,
+        query: { typeServices: { name: req.query.typeService } }
       }
     }
   ]).then((results) => {

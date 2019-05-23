@@ -122,8 +122,15 @@ const UserJobberSchema = new Schema({
     ref: 'Comments'
   },
   typeServices: {
-    type: Schema.Types.ObjectId,
-    ref: 'TypeServices'
+    name: {
+      type: String
+    },
+    description: {
+      type: String
+    },
+    price: {
+      type: Number
+    }
   }
 })
 
