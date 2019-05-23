@@ -121,16 +121,14 @@ const UserJobberSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Comments'
   },
-  typeServices: {
-    name: {
-      type: String
-    },
-    description: {
-      type: String
-    },
-    price: {
-      type: Number
-    }
+  serviceName: {
+    type: String
+  },
+  serviceDescription: {
+    type: String
+  },
+  servicePrice: {
+    type: Number
   }
 })
 

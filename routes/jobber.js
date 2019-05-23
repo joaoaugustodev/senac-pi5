@@ -50,8 +50,8 @@ router.get('/search/for/proximity', verifyToken, async (req, res) => {
         distanceMultiplier: 0.001,
         maxDistance: 100000,
         spherical: true,
-        query: { typeServices: { name: req.query.typeService } }
-      }
+        query: { serviceName: req.query.typeService }
+      },
     }
   ]).then((results) => {
     let listJobbers = [];
