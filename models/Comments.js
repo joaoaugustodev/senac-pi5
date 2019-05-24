@@ -23,6 +23,12 @@ const commentsSchema = new Schema({
   date: {
     type: Date,
     default: Date.now()
+  },
+  photo: {
+    type: String
+  },
+  userName: {
+    type: String
   }
 })
 

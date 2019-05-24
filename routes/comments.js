@@ -20,7 +20,7 @@ router.post('/create', verifyToken, async (req, res) => {
 
     const data = new comments(req.body)
     const commentReturn = await comments.findOne({'idUserJobber': data.idUserJobber, 'idUserOwner': data.idUserOwner, 'direction': data.direction})
-
+    
     if(commentReturn != null){
         return res.status(400).json({
             statusCode: 400,

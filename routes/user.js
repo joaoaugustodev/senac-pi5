@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const UserOwner = require('../models/UserOwner')
+const UserJobber = require('../models/UserJobber')
 const animal = require('../models/Animal')
 const comments = require('../models/Comments')
 const response = require('../models/Helpers/ResponseDefault')
@@ -136,8 +137,6 @@ router.put('/credit/:id/:value', uploadPhotos, verifyToken, async (req, res) => 
     const user = await UserOwner.findOne({'_id': userId});
     updatedCredit = parseInt(user.qtdCredit) + parseInt(creditValue)
 
-    console.log('credit:', user)
-
   }catch(err){
     res.status(500).json({
       statusCode: 500,
@@ -211,12 +210,30 @@ router.get('/comments/:id', verifyToken, async (req, res) =>{
   if(ownerReturn != null){
     try{
       const data = await comments.find({'idUserOwner': ownerId, 'direction': "JO"});
-      res.status(200).json({
-          statusCode: 200,
-          status: "OK",
-          message: 'Comentarios retornados com sucesso',
-          result: data
-      })
+
+      let listComments = [];
+
+      let cont = 0;
+      data.forEach(async element => {
+        let uidJobber = element.idUserJobber;
+        let jobber = await UserJobber.findOne({'_id': uidJobber});
+
+        element.photo = jobber.photo;
+        element.userName = jobber.name;
+
+        listComments.push(element);
+
+        if(cont == data.length - 1) {
+          res.status(200).json({
+            statusCode: 200,
+            status: "OK",
+            message: 'Comentarios retornados com sucesso',
+            result: listComments
+          })
+        }
+
+        cont++;
+      });
     }catch(e){
       res.status(500).json({
           statusCode: 500,

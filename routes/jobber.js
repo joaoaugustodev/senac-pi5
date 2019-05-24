@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
+const UserOwner = require('../models/UserOwner')
 const UserJobber = require('../models/UserJobber')
 const comments = require('../models/Comments')
 const response = require('../models/Helpers/ResponseDefault')
@@ -38,9 +39,6 @@ router.get('/:id', verifyToken, async (req, res) => {
 })
 
 router.get('/search/for/proximity', verifyToken, async (req, res) => {
-  console.log(req.query.typeService)
-  console.log(typeof req.query.typeService)
-  console.log({ typeServices: { name: req.query.typeService } })
   UserJobber.aggregate([
     {
       $geoNear: {
@@ -229,12 +227,31 @@ router.get('/comments/:id', verifyToken, async (req, res) =>{
   if(jobberReturn != null){
     try{
       const data = await comments.find({'idUserJobber': jobberId, 'direction': "OJ"});
-      res.status(200).json({
-          statusCode: 200,
-          status: "OK",
-          message: 'Comentarios retornados com sucesso',
-          result: data
-      })
+
+
+      let listComments = [];
+
+      let cont = 0;
+      data.forEach(async element => {
+        let uidOwner = element.idUserOwner;
+        let owner = await UserOwner.findOne({'_id': uidOwner});
+
+        element.photo = owner.photo;
+        element.userName = owner.name;
+
+        listComments.push(element);
+
+        if(cont == data.length - 1) {
+          res.status(200).json({
+            statusCode: 200,
+            status: "OK",
+            message: 'Comentarios retornados com sucesso',
+            result: listComments
+          })
+        }
+
+        cont++;
+      });
     }catch(e){
       res.status(500).json({
           statusCode: 500,
