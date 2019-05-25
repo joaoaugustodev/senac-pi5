@@ -19,6 +19,7 @@ const commentsSchema = new Schema({
   },
   rate: {
     type: Number,
+    required: true
   },
   date: {
     type: Date,
