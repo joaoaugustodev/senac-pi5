@@ -105,7 +105,7 @@ router.put('/edit/:id', uploadPhotos, verifyToken, (req, res) => {
     return res.status(401).json(response.send('error401', null, 'Usuário não está autenticado.'))
   }
 
-  UserOwner.findOneAndUpdate(req.params._id, helperEdit(req.body, req.files), {new: true}, (err, data) => {
+  UserOwner.findOneAndUpdate({'_id': req.params.id}, helperEdit(req.body, req.files), {new: true}, (err, data) => {
     if (err) return res.status(500).json(response.send('error500'))
     data.save()
     res.status(200).json(response.send('success', data, 'Dados atualizados com sucesso.'))
