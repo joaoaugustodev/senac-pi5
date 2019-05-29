@@ -210,30 +210,39 @@ router.get('/comments/:id', verifyToken, async (req, res) =>{
   if(ownerReturn != null){
     try{
       const data = await comments.find({'idUserOwner': ownerId, 'direction': "JO"});
+      if(data.length === 0){
+        res.status(200).json({
+          statusCode: 200,
+          status: "OK",
+          message: 'Comentarios retornados com sucesso',
+          result: []
+        })
+      }else{
+        let listComments = [];
+  
+        let cont = 0;
+        data.forEach(async element => {
+          let uidJobber = element.idUserJobber;
+          let jobber = await UserJobber.findOne({'_id': uidJobber});
+  
+          element.photo = jobber.photo;
+          element.userName = jobber.name;
+  
+          listComments.push(element);
+  
+          if(cont == data.length - 1) {
+            res.status(200).json({
+              statusCode: 200,
+              status: "OK",
+              message: 'Comentarios retornados com sucesso',
+              result: listComments
+            })
+          }
+  
+          cont++;
+        });
+      }
 
-      let listComments = [];
-
-      let cont = 0;
-      data.forEach(async element => {
-        let uidJobber = element.idUserJobber;
-        let jobber = await UserJobber.findOne({'_id': uidJobber});
-
-        element.photo = jobber.photo;
-        element.userName = jobber.name;
-
-        listComments.push(element);
-
-        if(cont == data.length - 1) {
-          res.status(200).json({
-            statusCode: 200,
-            status: "OK",
-            message: 'Comentarios retornados com sucesso',
-            result: listComments
-          })
-        }
-
-        cont++;
-      });
     }catch(e){
       res.status(500).json({
           statusCode: 500,
