@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken')
 const verifyToken = require('../middleware/verifyJwt')
 const upload = require('../middleware/upload')
 const helperEdit = require('./helper/helperEdit')
+
 const uploadPhotos = upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'capaPhoto', maxCount: 1 }])
 
 router.get('/:id', verifyToken, async (req, res) => {
@@ -260,6 +261,7 @@ router.get('/comments/:id', verifyToken, async (req, res) =>{
     }) 
   }
 })
+
 
 module.exports = router
 

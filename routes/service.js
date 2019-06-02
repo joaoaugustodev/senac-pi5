@@ -48,6 +48,7 @@ router.put('/edit', verifyToken, async (req, res) => {
     }
 
     let data = req.body;
+    
 
     let oldService = await service.findOne({_id: data._id});
 
@@ -70,7 +71,10 @@ router.put('/edit', verifyToken, async (req, res) => {
     }
 
     //Caso tenha alterações no ownerServiceConfirmation verifica se é para true
-    if(data.ownerServiceConfirmation !== undefined && data.ownerServiceConfirmation !== 'true') {
+    if(
+        (data.ownerServiceConfirmation !== undefined) &&
+        (data.ownerServiceConfirmation == false && data.ownerServiceConfirmation !== oldService.ownerServiceConfirmation)
+    ) {
         res.status(406).json({
             statusCode: 406,
             status: 'error not acceptable',
@@ -79,7 +83,10 @@ router.put('/edit', verifyToken, async (req, res) => {
     }
 
     //Caso tenha alterações no jobberServiceConfirmation verifica se é para true
-    if(data.jobberServiceConfirmation !== undefined && data.jobberServiceConfirmation !== 'true') {
+    if(
+        (data.jobberServiceConfirmation !== undefined) &&
+        (data.jobberServiceConfirmation == false && data.jobberServiceConfirmation !== oldService.jobberServiceConfirmation)
+    ) {
         res.status(406).json({
             statusCode: 406,
             status: 'error not acceptable',
@@ -88,59 +95,99 @@ router.put('/edit', verifyToken, async (req, res) => {
     }
 
     //Não permite que altere o status do jobber e do owner de uma vez
-    if(data.jobberServiceConfirmation !== undefined && data.ownerServiceConfirmation !== undefined) {
+    if(
+        (data.jobberServiceConfirmation !== undefined && (data.jobberServiceConfirmation !== oldService.jobberServiceConfirmation)) && 
+        (data.ownerServiceConfirmation !== undefined && (data.ownerServiceConfirmation !== oldService.ownerServiceConfirmation))
+    ) {
         res.status(406).json({
             statusCode: 406,
             status: 'error not acceptable',
             message: 'Não é possível alterar ambos os status de uma vez.'
         })
+    } else {
+
+        //realiza o update
+        service.findOneAndUpdate({_id: data._id}, data, {upsert:false}, async (err, doc) => {
+            let newService = await service.findOne({_id: data._id});
+    
+            console.log(typeof newService.date, newService.date)
+            console.log(typeof new Date(), new Date());
+            console.log(newService.date < new Date());
+
+            if(
+                (newService.ownerServiceConfirmation !== true || newService.ownerServiceConfirmation !== true) &&
+                (newService.serviceStatus !== 'executado' || newService.serviceStatus !== 'pago')
+            ) {
+                if(newService.date < new Date()) {
+                    console.log("status executado")
+                    await service.findOneAndUpdate({_id: data._id}, {serviceStatus: 'executado'}, {upsert:false}, async (err, doc) => {
+                        if(!err) {
+                            newService.serviceStatus = 'executado';
+        
+                            res.status(200).json({
+                                statusCode: 200,
+                                status: 'OK',
+                                message: 'Dados alterados com sucesso',
+                                result: newService
+                            })
+                        } else {
+                            res.status(500).json({
+                                statusCode: 500,
+                                status: 'error',
+                                message: "Os dados foram alterados mas não foi possível mudar o status para 'executado'",
+                                result: err
+                            })
+                        }
+                    }) 
+                }
+            }
+    
+            //caso os dois tenham confirmado altera o status do serviço para executado
+            if(newService.ownerServiceConfirmation == true && newService.jobberServiceConfirmation == true && newService.serviceStatus !== 'pago') {
+                console.log('status pago')
+                await service.findOneAndUpdate({_id: data._id}, {serviceStatus: 'pago'}, {upsert:false}, async (err, doc) => {
+                    if(!err) {
+                        newService.serviceStatus = 'pago';
+    
+                        res.status(200).json({
+                            statusCode: 200,
+                            status: 'OK',
+                            message: 'Dados alterados com sucesso',
+                            result: newService
+                        })
+                    } else {
+                        res.status(500).json({
+                            statusCode: 500,
+                            status: 'error',
+                            message: "Os dados foram alterados mas não foi possível mudar o status para 'pago'",
+                            result: err
+                        })
+                    }
+                })
+            }
+
+            console.log("PASSOU BATIDO")
+    
+            //responde um sucesso, informando que os dados foram alterados.
+            if(!err) {
+                res.status(200).json({
+                    statusCode: 200,
+                    status: 'OK',
+                    message: 'Dados alterados com sucesso',
+                    result: newService
+                })
+            }
+            
+            //caso tenha dado erro no update
+            res.status(500).json({
+                statusCode: 500,
+                status: 'error',
+                message: 'Não foi possível completar a operação.',
+                result: err
+            })
+        })
     }
 
-    //realiza o update
-    service.findOneAndUpdate({_id: data._id}, data, {upsert:false}, async (err, doc) => {
-        let newService = await service.findOne({_id: data._id});
-
-        //caso os dois tenham confirmado altera o status do serviço para executado
-        if(newService.ownerServiceConfirmation == true && newService.jobberServiceConfirmation == true && newService.serviceStatus !== 'executado') {
-            service.findOneAndUpdate({_id: data._id}, {serviceStatus: 'executado'}, {upsert:false}, async (err, doc) => {
-                if(!err) {
-                    newService.serviceStatus = 'executado';
-
-                    res.status(200).json({
-                        statusCode: 200,
-                        status: 'OK',
-                        message: 'Dados alterados com sucesso',
-                        result: newService
-                    })
-                } else {
-                    res.status(500).json({
-                        statusCode: 500,
-                        status: 'error',
-                        message: "Os dados foram alterados mas não foi possível mudar o status para 'executado'",
-                        result: err
-                    })
-                }
-            })
-        }
-
-        //responde um sucesso, informando que os dados foram alterados.
-        if(!err) {
-            res.status(200).json({
-                statusCode: 200,
-                status: 'OK',
-                message: 'Dados alterados com sucesso',
-                result: newService
-            })
-        }
-        
-        //caso tenha dado erro no update
-        res.status(500).json({
-            statusCode: 500,
-            status: 'error',
-            message: 'Não foi possível completar a operação.',
-            result: err
-        })
-    })
 
 })
 

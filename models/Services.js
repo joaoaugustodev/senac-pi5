@@ -15,11 +15,6 @@ const servicesSchema = new Schema({
     ref: 'UserJobber',
     required: true
   },
-  idTypeService: {
-    type: Schema.Types.ObjectId,
-    ref: 'TypeServices',
-    required: true
-  },
   idAnimal: {
     type: Schema.Types.ObjectId,
     ref: 'Animal',
@@ -39,7 +34,7 @@ const servicesSchema = new Schema({
   },
   serviceStatus: {
     type: String,
-    default: 'solicitado' //solicitado - cancelado - executado
+    default: 'solicitado' //solicitado - cancelado - executado - pago
   }
 })
 
