@@ -5,6 +5,7 @@ const UserOwner = require('../models/UserOwner')
 const UserJobber = require('../models/UserJobber')
 const animal = require('../models/Animal')
 const comments = require('../models/Comments')
+const service = require('../models/Services')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
 const verifyToken = require('../middleware/verifyJwt')
@@ -262,6 +263,83 @@ router.get('/comments/:id', verifyToken, async (req, res) =>{
   }
 })
 
+router.get('/services/:id', verifyToken, async (req, res) =>{
+  if (!req.token) {
+    return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
+  }
+  const ownerId = req.params.id
+  const ownerReturn = await UserOwner.findOne({'_id': req.params.id})
+
+  if(ownerReturn != null){
+    try{
+      const data = await service.find({'idUserOwner': ownerId});
+      
+      if(data.length === 0){
+        res.status(200).json({
+          statusCode: 200,
+          status: "OK",
+          message: 'Serviços retornados com sucesso',
+          result: []
+        })
+      }else{
+        let listServices = [];
+  
+        let cont = 0;
+        data.forEach(async element => {
+          let uidJobber = element.idUserJobber;
+          let uidAnimal = element.idAnimal
+          let uidOwner = req.params.id
+
+          let owner = await UserOwner.findOne({'_id': uidOwner});
+          let userAnimal = await animal.findOne({'_id': uidAnimal});
+          let jobber = await UserJobber.findOne({'_id': uidJobber});
+          
+          let internalLoad = {}
+
+          internalLoad.ownerName = owner.name;
+          internalLoad.ownerEmail = owner.email;
+          internalLoad.jobberName = jobber.name;
+          internalLoad.jobberEmail = jobber.email;
+          internalLoad.jobberService = jobber.serviceName;
+          internalLoad.jobberValue = jobber.servicePrice;
+          internalLoad.animalName = userAnimal.name;
+          internalLoad.date = element.date;
+          internalLoad.ownerServiceConfirmation = element.ownerServiceConfirmation;
+          internalLoad.jobberServiceConfirmation = element.jobberServiceConfirmation
+          internalLoad.serviceStatus = element.serviceStatus
+  
+          listServices.push(internalLoad);
+  
+          if(cont == data.length - 1) {
+            res.status(200).json({
+              statusCode: 200,
+              status: "OK",
+              message: 'Serviços retornados com sucesso',
+              result: listServices
+            })
+          }
+  
+          cont++;
+        });
+      }
+
+    }catch(e){
+      res.status(500).json({
+          statusCode: 500,
+          status: "Internal Server Error",
+          message: "Erro ao consultar os serviços do dono informado",
+          error: e
+      })
+    }
+  }else{
+    res.status(400).json({
+      statusCode: 400,
+      status: "Inconsistent request",
+      message: 'Request para um usuário que não existe',
+      result: null
+    }) 
+  }
+})
 
 module.exports = router
 
