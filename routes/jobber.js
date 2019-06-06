@@ -41,10 +41,12 @@ router.get('/:id', verifyToken, async (req, res) => {
 })
 
 router.get('/search/for/proximity', verifyToken, async (req, res) => {
+  console.log("ENTREI")
+  console.log(req.query.lng, req.query.lat, req.query.typeService)
   UserJobber.aggregate([
     {
       $geoNear: {
-        near: { type: "Point", coordinates: [ parseFloat(req.query.lng), parseFloat(req.query.lat) ] },
+        near: { type: "Point", coordinates: [ parseFloat(req.query.lat), parseFloat(req.query.lng) ] },
         distanceField: "dist.calculated",
         includeLocs: "dist.location",
         distanceMultiplier: 0.001,
@@ -54,6 +56,8 @@ router.get('/search/for/proximity', verifyToken, async (req, res) => {
       },
     }
   ]).then((results) => {
+    console.log("THEN")
+    console.log(results)
     let listJobbers = [];
     results.forEach(element => {
       delete element.password;
@@ -68,6 +72,8 @@ router.get('/search/for/proximity', verifyToken, async (req, res) => {
     })
   })
   .catch((err) => {
+    console.log("CATCH")
+    console.log(err)
     res.status(200).json({
       statusCode: 500,
       status: 'Internal server error',
