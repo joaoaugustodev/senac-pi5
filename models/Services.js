@@ -21,7 +21,7 @@ const servicesSchema = new Schema({
     required: true
   },
   date: {
-    type: Date,
+    type: Number,
     required: [true, 'A data do serviço é obrigatória']
   },
   ownerServiceConfirmation: {

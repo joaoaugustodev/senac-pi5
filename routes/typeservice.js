@@ -7,7 +7,7 @@ const response = require('../models/Helpers/ResponseDefault')
 const verifyToken = require('../middleware/verifyJwt')
 
 router.post('/create', verifyToken, async (req, res) => {
-    console.log("entrei no create")
+
     if (!req.token) {
         return res.status(401).json(response.send('error401', null, 'O usuário não está autenticado.'))
     }
