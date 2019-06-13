@@ -314,6 +314,7 @@ router.get('/services/:id', verifyToken, async (req, res) =>{
           
           let internalLoad = {}
 
+          internalLoad.id = element.id;
           internalLoad.ownerName = owner.name;
           internalLoad.ownerEmail = owner.email;
           internalLoad.jobberName = jobber.name;

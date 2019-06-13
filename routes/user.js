@@ -296,30 +296,68 @@ router.get('/services/:id', verifyToken, async (req, res) =>{
           
           let internalLoad = {}
 
-          internalLoad.ownerName = owner.name;
-          internalLoad.ownerEmail = owner.email;
-          internalLoad.jobberName = jobber.name;
-          internalLoad.jobberEmail = jobber.email;
-          internalLoad.jobberService = jobber.serviceName;
-          internalLoad.jobberValue = jobber.servicePrice;
-          internalLoad.animalName = userAnimal.name;
-          internalLoad.date = element.date;
-          internalLoad.ownerServiceConfirmation = element.ownerServiceConfirmation;
-          internalLoad.jobberServiceConfirmation = element.jobberServiceConfirmation
-          internalLoad.serviceStatus = element.serviceStatus
-  
-          listServices.push(internalLoad);
-  
-          if(cont == data.length - 1) {
-            res.status(200).json({
-              statusCode: 200,
-              status: "OK",
-              message: 'Serviços retornados com sucesso',
-              result: listServices
+          console.log(element.date < Date.now())
+          console.log(element.serviceStatus == 'solicitado')
+          if(element.date < Date.now() && element.serviceStatus == 'solicitado') {
+            element.serviceStatus = 'executado';
+            await service.findOneAndUpdate({_id: element.id}, { serviceStatus: 'executado' }, {upsert:false}, async (err, doc) => {
+              
+              internalLoad.id = element.id;
+              internalLoad.ownerName = owner.name;
+              internalLoad.ownerEmail = owner.email;
+              internalLoad.jobberName = jobber.name;
+              internalLoad.jobberEmail = jobber.email;
+              internalLoad.jobberService = jobber.serviceName;
+              internalLoad.jobberValue = jobber.servicePrice;
+              internalLoad.animalName = userAnimal.name;
+              internalLoad.date = element.date;
+              internalLoad.ownerServiceConfirmation = element.ownerServiceConfirmation;
+              internalLoad.jobberServiceConfirmation = element.jobberServiceConfirmation
+              internalLoad.serviceStatus = element.serviceStatus
+      
+              listServices.push(internalLoad);
+      
+              if(cont == data.length - 1) {
+                res.status(200).json({
+                  statusCode: 200,
+                  status: "OK",
+                  message: 'Serviços retornados com sucesso',
+                  result: listServices
+                })
+              }
+      
+              cont++;
+
             })
+          } else {
+
+            internalLoad.id = element.id;
+            internalLoad.ownerName = owner.name;
+            internalLoad.ownerEmail = owner.email;
+            internalLoad.jobberName = jobber.name;
+            internalLoad.jobberEmail = jobber.email;
+            internalLoad.jobberService = jobber.serviceName;
+            internalLoad.jobberValue = jobber.servicePrice;
+            internalLoad.animalName = userAnimal.name;
+            internalLoad.date = element.date;
+            internalLoad.ownerServiceConfirmation = element.ownerServiceConfirmation;
+            internalLoad.jobberServiceConfirmation = element.jobberServiceConfirmation
+            internalLoad.serviceStatus = element.serviceStatus
+    
+            listServices.push(internalLoad);
+    
+            if(cont == data.length - 1) {
+              res.status(200).json({
+                statusCode: 200,
+                status: "OK",
+                message: 'Serviços retornados com sucesso',
+                result: listServices
+              })
+            }
+    
+            cont++;
           }
-  
-          cont++;
+
         });
       }
 

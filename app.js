@@ -54,3 +54,12 @@ app.use(function(err, req, res) {
 })
 
 module.exports = app
+
+
+// if(element.date < Date.now()) {
+//   await service.findOneAndUpdate({_id: data._id}, data, {upsert:false}, async (err, doc) => {
+    
+//   })
+// } else {
+
+// }
