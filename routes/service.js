@@ -5,6 +5,8 @@ const service = require('../models/Services')
 const response = require('../models/Helpers/ResponseDefault')
 const jwt = require('jsonwebtoken')
 const verifyToken = require('../middleware/verifyJwt')
+const owner = require('../models/UserOwner')
+const jobber = require('../models/UserJobber')
 
 router.post('/create', verifyToken, async (req, res) => {
     if (!req.token) {
@@ -162,14 +164,31 @@ router.put('/edit', verifyToken, async (req, res) => {
             if(newService.ownerServiceConfirmation == true && newService.jobberServiceConfirmation == true) {
                 
                 newService.serviceStatus = 'pago';
-                await service.findOneAndUpdate({_id: data._id}, newService, {upsert:false}, async (err, doc) => {
-                    res.status(200).json({
-                        statusCode: 200,
-                        status: 'OK',
-                        message: 'serviço alterado com sucesso',
-                        result: newService
-                    })
+
+                creditTransfer(newService).then(async (data) => {
+                    if(data) {
+                        console.log(newService)
+                        console.log('Identifier ======>')
+                        console.log(newService._id)
+                        await service.findOneAndUpdate({_id: newService._id}, newService, {upsert:false}, async (err, doc) => {
+                            console.log('SERVICE ATUALIZADO =====>')
+                            console.log(newService)
+                            res.status(200).json({
+                                statusCode: 200,
+                                status: 'OK',
+                                message: 'serviço alterado com sucesso',
+                                result: newService
+                            })
+                        })
+                    } else {
+                        res.status(500).json({
+                            statusCode: 500,
+                            status: 'error',
+                            message: 'Não foi possível realizar a transferencia'
+                        })
+                    }
                 })
+
             } else {
                 res.status(200).json({
                     statusCode: 200,
@@ -182,4 +201,25 @@ router.put('/edit', verifyToken, async (req, res) => {
     }
 });
 
+
+function creditTransfer(service) {
+    return new Promise(async (resolve, reject) => {
+        let userOwner = await owner.findOne({_id: service.idUserOwner});
+        let userJobber = await jobber.findOne({_id: service.idUserJobber});
+
+        userOwner.qtdCredit = userOwner.qtdCredit - userJobber.servicePrice;
+        userJobber.qtdCredit = userJobber.qtdCredit + userJobber.servicePrice;
+        
+        console.log(userOwner.qtdCredit, userJobber.qtdCredit);
+        await owner.findOneAndUpdate({_id: userOwner._id}, userOwner, async (errOwner, doc) => {
+            await jobber.findOneAndUpdate({_id: userJobber._id}, userJobber, async (errJobber, doc) => {
+                if(!errOwner && !errJobber) {
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            })
+        })
+    })
+}
 module.exports = router
